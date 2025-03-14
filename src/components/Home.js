@@ -59,39 +59,53 @@ const Home = ({ provider, account, escrow, togglePop }) => {
   // Funcție pentru a transfera organul
   const transferOrganHandler = async () => {
     try {
-      if (!doctorApproved) {
-        alert("Doctor approval is required before transferring the organ.");
-        return;
-      }
+        if (!doctorApproved) {
+            alert("Doctor approval is required before transferring the organ.");
+            return;
+        }
 
-      const signer = provider.getSigner();  // Obține semnatarul de la provider
-      const escrowWithSigner = escrow.connect(signer);  // Conectează semnatarul la contract
+        const signer = provider.getSigner();
+        const escrowWithSigner = escrow.connect(signer);
 
-      // Apelează funcția contractului pentru a transfera organul
-      await escrowWithSigner.transferOrgan();
-      alert("Organ transferred successfully!");
-      fetchDetails(); // Refresh details after transfer
+
+        // 🏦 Apelează contractul pentru a transfera organul
+        const tx = await escrowWithSigner.transferOrgan();
+        await tx.wait(); 
+
+        setCurrentOwner(futureOwner); // Setăm noul proprietar pe moment
+        setFutureOwner(null); // Eliminăm viitorul proprietar temporar
+        alert("Organ transferred successfully!");
+        
+        fetchDetails(); // 🔄 Reîmprospătăm datele oficiale după confirmare
     } catch (error) {
-      console.error("Error transferring organ:", error);
-      alert("Failed to transfer organ. Please try again.");
+        console.error("Error transferring organ:", error);
+        alert("Failed to transfer organ. Please try again.");
     }
-  };
+};
+
 
   // Funcție pentru ca doctorul să aprobe transplantul
   const approveTransplantHandler = async () => {
     try {
-      const signer = provider.getSigner();  // Obține semnatarul de la provider
-      const escrowWithSigner = escrow.connect(signer);  // Conectează semnatarul la contract
+        const signer = provider.getSigner();
+        const escrowWithSigner = escrow.connect(signer);
 
-      // Apelează funcția contractului pentru a aproba transplantul
-      await escrowWithSigner.approveTransplant();
-      alert("Transplant approved successfully!");
-      fetchDetails(); // Refresh details after approval
+
+        // Apelează funcția contractului pentru a aproba transplantul
+        const tx = await escrowWithSigner.approveTransplant();
+        await tx.wait();
+        
+        // Actualizăm instant UI ca să pară că s-a aprobat deja
+        setDoctorApproved(true);
+
+        alert("Transplant approved successfully!");
+        fetchDetails(); // Reîmprospătăm datele oficiale
     } catch (error) {
-      console.error("Error approving transplant:", error);
-      alert("Failed to approve transplant. Please try again.");
+        console.error("Error approving transplant:", error);
+        alert("Failed to approve transplant. Please try again.");
     }
-  };
+};
+
 
 
   
