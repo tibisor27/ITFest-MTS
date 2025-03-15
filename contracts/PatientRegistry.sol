@@ -23,6 +23,10 @@ contract PatientRegistry {
         address patientAddress,
         string memory info
     ) public onlyDoctor {
+        require(
+            patients[patientAddress].patientAddress == address(0),
+            "Patient already exists"
+        );
         patients[patientAddress] = Patient(patientAddress, info);
         patientList.push(patientAddress);
     }

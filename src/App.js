@@ -53,28 +53,18 @@ function App() {
         console.error("❌ Chain ID not found in config:", network.chainId);
         return;
       }
-  
       window.ethereum.on('accountsChanged', async() => {
         const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
         const account = ethers.utils.getAddress(accounts[0])
         setAccount(account);
       }); 
-      
       const organNFTAddress = config[network.chainId]?.organNFT?.address;
       if (!organNFTAddress) {
         console.error("❌ Adresa OrganNFT este undefined! Verifică config.json");
         return;
       }
-  
       const organNFT = new ethers.Contract(organNFTAddress, OrganNFT, signer);
       setOrganNFT(organNFT);
-  
-      const waitingList = new ethers.Contract(
-        config[network.chainId].waitingList.address,
-        WaitingList,
-        provider
-      );
-  
       const escrow = new ethers.Contract(
         config[network.chainId].escrow.address,
         OrganEscrow,
@@ -87,7 +77,6 @@ function App() {
         provider
       );
   
-      setWaitingList(waitingList);
       setEscrow(escrow);
       setPatientRegistry(patientRegistry);
   
@@ -175,6 +164,7 @@ const addPatientHandler = async () => {
 
   try {
     const signer = provider.getSigner();
+    console.log("🔐 Semnatarul:", signer);
     const patientRegistryWithSigner = patientRegistry.connect(signer);
 
     const tx = await patientRegistryWithSigner.addPatient(patientAddress, patientInfo);
@@ -188,14 +178,7 @@ const addPatientHandler = async () => {
     console.error("Error adding patient:", error);
     alert("Failed to add patient.");
   }
-
-
-
 };
-
-
-
-
   useEffect(() => {
     loadBlockchainData();
   }, []);
