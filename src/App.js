@@ -270,6 +270,33 @@ const fetchPatientData = async (patientAddress) => {
 
 
 
+const findPatientByCriteria = async (criteria) => {
+  if (!patientRegistry) {
+    console.error("❌ Contractul PatientRegistry nu este inițializat!");
+    return null;
+  }
+
+  try {
+    const patientList = await patientRegistry.getPatientList();
+    
+    for (const patientAddress of patientList) {
+      const patient = await patientRegistry.patients(patientAddress);
+      const decryptedData = decryptData(patient.patientInfo, secretKey);
+
+      if (decryptedData && decryptedData.bloodType === criteria.bloodType) {
+        console.log("✅ Pacient găsit:", decryptedData);
+        return { address: patientAddress, ...decryptedData };
+      }
+    }
+
+    console.warn("⚠️ Niciun pacient nu corespunde criteriului.");
+    return null;
+  } catch (error) {
+    console.error("❌ Eroare la căutarea pacientului:", error);
+    return null;
+  }
+};
+
 
 
   useEffect(() => {
@@ -442,6 +469,19 @@ const fetchPatientData = async (patientAddress) => {
   {/* Afișează datele decriptate ale pacientului */}
   {decryptedPatientData && (
     <div className="mt-4 p-4 border rounded-lg bg-gray-100">
+        <button
+    onClick={async () => {
+      const foundPatient = await findPatientByCriteria({ bloodType: "B+" });
+      if (foundPatient) {
+        alert(`Pacient găsit: ${foundPatient.name}, Adresă: ${foundPatient.address}`);
+      } else {
+        alert("Nu s-a găsit niciun pacient cu B+.");
+      }
+    }}
+    className="bg-red-500 text-white p-2 rounded-md"
+  >
+    Find First B+ Patient
+  </button>
       <h3 className="text-lg font-bold mb-2">Patient Details</h3>
       <p><strong>Name:</strong> {decryptedPatientData.name}</p>
       <p><strong>Blood Type:</strong> {decryptedPatientData.bloodType}</p>
