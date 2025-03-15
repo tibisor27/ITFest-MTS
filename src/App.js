@@ -30,6 +30,7 @@ function App() {
   const [patientRegistry, setPatientRegistry] = useState(null);
   const [patients, setPatients] = useState([]); // Lista pacienților adăugați
   const [donorAddress, setDonorAddress] = useState(null);
+  const [selectedPacient, setSelectedPatient] = useState(null); 
 
 
   const loadBlockchainData = async () => {
@@ -114,13 +115,36 @@ function App() {
         return {
           address: address,
           info: patient.patientInfo,
-          bloodType: patient.bloodType,
-          diseaseSeverity: patient.diseaseSeverity,
-          surgicalRisk: patient.surgicalRisk,
+          bloodType: patient.bloodType.toString(),
+          diseaseSeverity: patient.diseaseSeverity.toString(),
+          surgicalRisk: patient.surgicalRisk.toString()
         };
       });
       const allPatientData = await Promise.all(patientDataPromises);
-
+      const selectPatientWithHighestSeverity = () => {
+        // Găsim pacientul cu cel mai mare `diseaseSeverity` din lista `allPatientData`
+        const patientWithHighestSeverity = allPatientData.reduce((maxPatient, currentPatient) => {
+          const currentSeverity = parseInt(currentPatient.diseaseSeverity, 10);  // Convertim la număr
+          if (!maxPatient || currentSeverity > parseInt(maxPatient.diseaseSeverity, 10)) {
+            return currentPatient; // Actualizăm pacientul cu cel mai mare diseaseSeverity
+          }
+          return maxPatient;
+        }, null);
+      
+        // Verificăm și setăm pacientul selectat
+        if (patientWithHighestSeverity) {
+          console.log("Pacientul cu cel mai mare diseaseSeverity este:", patientWithHighestSeverity);
+          setSelectedPatient(patientWithHighestSeverity); // Setează pacientul în starea aplicației
+      
+          // Afișează mesaj în UI sau alertă
+          alert(`Pacientul selectat pentru transplant: ${patientWithHighestSeverity.address}`);
+        } else {
+          alert("Nu s-a găsit niciun pacient cu diseaseSeverity valid.");
+        }
+      };
+      await selectPatientWithHighestSeverity();
+      
+      
       console.log("All Patient Data:", allPatientData);
       return allPatientData;
       // 🔥 Apelează fetchDonorAddress DOAR după ce organNFT este setat!
@@ -180,12 +204,12 @@ const addPatientHandler = async () => {
   const diseaseSeverity = prompt("Enter patient diseaseSeverity:");
   const surgicalRisk = prompt("Enter patient surgicalRisk:");
 
-    console.log("Original Data:");
+  console.log("Original Data:");
   console.log("Patient Info:", patientInfo);
   console.log("Blood Type:", bloodType);
   console.log("Disease Severity:", diseaseSeverity);
   console.log("Surgical Risk:", surgicalRisk);
-    const secretKey = "your-secret-key";  // Cheia secretă folosită pentru criptare
+  const secretKey = "your-secret-key";  // Cheia secretă folosită pentru criptare
   const encryptedInfo = AES.encrypt(patientInfo, secretKey).toString();  // Criptăm info pacientului
   const encryptedBloodType = AES.encrypt(bloodType, secretKey).toString();  // Criptăm bloodType
   const encryptedDiseaseSeverity = AES.encrypt(diseaseSeverity, secretKey).toString();  // Criptăm diseaseSeverity
@@ -224,19 +248,13 @@ const addPatientHandler = async () => {
       <Search />
 
       <div className="p-7 flex flex-col gap-y-6 items-center">
-  <p className="text-4xl font-bold">Organs For You</p>
-
-
-
-{account && organNFT && (
-  <div className="mt-5">
-    <h3 className="text-xl font-bold">Donate an Organ</h3>
-    <AddOrgan organNFT={organNFT} provider={provider} account={account} donorAddress={donorAddress} />
-  </div>
-)}
-
-
-      
+        <p className="text-4xl font-bold">Organs For You</p>
+        {account && organNFT && (
+          <div className="mt-5">
+            <h3 className="text-xl font-bold">Donate an Organ</h3>
+            <AddOrgan organNFT={organNFT} provider={provider} account={account} donorAddress={donorAddress} />
+          </div>
+        )}
       {/* Buton pentru a adăuga pacienti */}
       {account && (
         <div>
@@ -268,7 +286,7 @@ const addPatientHandler = async () => {
       )}
     </ul>
   </div>
-
+  
   <div className="p-7 flex flex-col gap-y-6 items-center">
   <p className="text-4xl font-bold">Organs For You</p>
   <div className="flex justify-center space-x-5 p-1">
