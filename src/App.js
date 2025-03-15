@@ -256,37 +256,41 @@ const addPatientHandler = async () => {
     </ul>
   </div>
 
-      <div className="p-7 flex flex-col gap-y-6 items-center">
-        <p className="text-4xl font-bold">Organs For You</p>
-        <div className="flex justify-center space-x-5 p-1">
-        {!organs.length ? (
-  <p>Loading...</p>
-) : (
-  organs.map((organ, index) => (
-    organ && organ.attributes ? (
-      <div key={index} className="rounded-lg shadow-xl" onClick={() => togglePop(organ)}>
-        <div>
-          <img src={organ.image || "fallback.jpg"} className="w-[350px] h-auto rounded-t-lg" />
-        </div>
-        <div>
-          <div className="flex justify-between p-3">
-            <div className="bg-red-200 flex items-center py-1 px-4 rounded-xl cursor-pointer">
-              <p>Blood Type: {organ.attributes.find(attr => attr.trait_type === "Blood Type")?.value || "N/A"}</p>
+  <div className="p-7 flex flex-col gap-y-6 items-center">
+  <p className="text-4xl font-bold">Organs For You</p>
+  <div className="flex justify-center space-x-5 p-1">
+    {!organs.length ? (
+      <p>Loading...</p>
+    ) : (
+      organs.map((organ, index) => (
+        organ && organ.attributes ? (
+          <div key={index} className="rounded-lg shadow-xl" onClick={() => togglePop(organ)}>
+            <div>
+              <img src={organ.image || "fallback.jpg"} className="w-[350px] h-auto rounded-t-lg" />
             </div>
-            <div className="flex items-center">
-              <strong>Description: {organ.attributes.find(attr => attr.trait_type === "Description")?.value || "No description"}</strong>
+            <div className="p-3">
+              <p><strong>Organ:</strong> {organ.organ || "N/A"}</p>
+              <p><strong>Blood Type:</strong> {organ.BloodType || organ.attributes?.find(attr => attr.trait_type === "Blood Type")?.value || "N/A"}</p>
+              <p><strong>Description:</strong> {organ.description || "No description"}</p>
+              <p><strong>ID:</strong> {organ.id}</p>
+              
+              {/* Afișează toate atributele disponibile */}
+              <div className="mt-2">
+                <strong>Attributes:</strong>
+                <ul>
+                  {organ.attributes.map((attr, i) => (
+                    <li key={i}>{attr.trait_type}: {attr.value}</li>
+                  ))}
+                </ul>
+              </div>
             </div>
           </div>
-        </div>
-      </div>
-    ) : null
-  ))
-)}
+        ) : null
+      ))
+    )}
+  </div>
+</div>
 
-
-
-        </div>
-        </div>
 
       </div>
 
