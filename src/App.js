@@ -190,12 +190,14 @@ const addPatientHandler = async () => {
   const encryptedBloodType = AES.encrypt(bloodType, secretKey).toString();  // Criptăm bloodType
   const encryptedDiseaseSeverity = AES.encrypt(diseaseSeverity, secretKey).toString();  // Criptăm diseaseSeverity
   const encryptedSurgicalRisk = AES.encrypt(surgicalRisk, secretKey).toString();  // Criptăm surgicalRisk
+  console.log("Encrypted Info:", encryptedInfo);
+
 
   try {
     const signer = provider.getSigner();
     const patientRegistryWithSigner = patientRegistry.connect(signer);
     console.log("patientRegistryWithSigner!!!!", patientRegistryWithSigner.address);
-    const tx = await patientRegistryWithSigner.addPatient(patientAddress, patientInfo,bloodType,diseaseSeverity,surgicalRisk);
+    const tx = await patientRegistryWithSigner.addPatient(patientAddress, encryptedInfo,bloodType,diseaseSeverity,surgicalRisk);
     await tx.wait(); // 🔥 Așteptăm confirmarea tranzacției
     alert(`Patient ${patientAddress} added successfully`);
 
