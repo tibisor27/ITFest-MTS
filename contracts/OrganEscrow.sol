@@ -53,5 +53,8 @@ function getOwners() external view returns (address currentOwner, address future
     futureOwner = patient; // Viitorul proprietar
 }
 
+function isPatientSet() public view returns (bool) {
+    return patient != address(0);
+}
 
 }

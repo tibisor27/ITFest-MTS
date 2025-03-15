@@ -33,21 +33,24 @@ const Home = ({ organ, provider, account, escrow, togglePop, organs, findPatient
   };
 
   useEffect(() => {
-    fetchDetails();
+    const checkIfPatientIsSet = async () => {
+      const isSet = await escrow.isPatientSet();
+      if (!isSet && !patientSet) { // Dacă pacientul nu a fost setat în contract și nici în starea locală
+        const foundPatient = await findPatientByCriteria({ bloodType: "B+" });
   
-    const autoAssignPatient = async () => {
-      const foundPatient = await findPatientByCriteria({ bloodType: "B+" });
-  
-      if (foundPatient) {
-        console.log("🔍 Pacient găsit automat:", foundPatient);
-        await setPatientHandler(foundPatient.address); // Setează automat pacientul
-      } else {
-        console.log("⚠️ Niciun pacient potrivit găsit.");
+        if (foundPatient) {
+          console.log("🔍 Pacient găsit automat:", foundPatient);
+          await setPatientHandler(foundPatient.address);
+          setPatientSet(true); // Marchează că pacientul a fost setat
+        } else {
+          console.log("⚠️ Niciun pacient potrivit găsit.");
+        }
       }
     };
   
-    autoAssignPatient();
-  }, []);
+    fetchDetails(); // Încarcă detaliile inițiale
+    checkIfPatientIsSet();
+  }, [patientSet]); // Adaugă `patientSet` ca dependență
   
 
   // Funcție pentru a seta adresa pacientului
@@ -167,12 +170,12 @@ const Home = ({ organ, provider, account, escrow, togglePop, organs, findPatient
           </div>
         )}
         <div className="flex flex-col gap-3 mt-5">
-          {account === donor && (
+          {/* {account === donor && (
             <button onClick={() => setPatientHandler(prompt("Enter patient's address:"))}
               className="bg-blue-500 text-white p-2 rounded-md">
               Set Patient
             </button>
-          )}
+          )} */}
 
           {account === doctor && (
             <button onClick={approveTransplantHandler}
