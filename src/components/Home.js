@@ -8,6 +8,8 @@ const Home = ({ provider, account, escrow, togglePop }) => {
   const [doctorApproved, setDoctorApproved] = useState(false);
   const [currentOwner, setCurrentOwner] = useState(null);
   const [futureOwner, setFutureOwner] = useState(null);
+  const [organData, setOrganData] = useState(null);
+
 
   // Funcție pentru a prelua detalii despre transplant
   const fetchDetails = async () => {
@@ -75,7 +77,7 @@ const Home = ({ provider, account, escrow, togglePop }) => {
         setCurrentOwner(futureOwner); // Setăm noul proprietar pe moment
         setFutureOwner(null); // Eliminăm viitorul proprietar temporar
         alert("Organ transferred successfully!");
-        
+
         fetchDetails(); // 🔄 Reîmprospătăm datele oficiale după confirmare
     } catch (error) {
         console.error("Error transferring organ:", error);
@@ -149,6 +151,8 @@ const Home = ({ provider, account, escrow, togglePop }) => {
               Transfer Organ
             </button>
           )}
+
+          
         </div>
       </div>
     </div>

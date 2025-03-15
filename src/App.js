@@ -111,6 +111,8 @@ function App() {
       }
   
       setOrgans(fetchedOrgans);
+
+      console.log("✅ Organs loaded:", fetchedOrgans);
   
       // Load patients
       const patientList = await patientRegistry.getPatientList();
@@ -257,32 +259,32 @@ const addPatientHandler = async () => {
       <div className="p-7 flex flex-col gap-y-6 items-center">
         <p className="text-4xl font-bold">Organs For You</p>
         <div className="flex justify-center space-x-5 p-1">
-          {!organs.length ? (
-            <p>Loading...</p>
-          ) : (
-            organs.map((organ, index) => (
-              <div key={index} className="rounded-lg shadow-xl" onClick={() => togglePop(organ)}>
-                <div>
-                  <img src={organ.image} className="w-[350px] h-auto rounded-t-lg" />
-                </div>
-                <div>
-                  <div className="flex justify-between p-3">
-                    <div className="bg-red-200 flex items-center py-1 px-4 rounded-xl cursor-pointer">
-                      <p>{organ.attributes[0].value}</p>
-                    </div>
-                    <div className="flex items-center">
-                      <strong>{organ.attributes[2].value}</strong> bds |
-                      <strong>{organ.attributes[3].value}</strong> ba |
-                      <strong>{organ.attributes[4].value}</strong> sqft
-                    </div>
-                  </div>
-                  <div className="p-3">
-                    <p className="text-sm">{organ.address}</p>
-                  </div>
-                </div>
-              </div>
-            ))
-          )}
+        {!organs.length ? (
+  <p>Loading...</p>
+) : (
+  organs.map((organ, index) => (
+    organ && organ.attributes ? (
+      <div key={index} className="rounded-lg shadow-xl" onClick={() => togglePop(organ)}>
+        <div>
+          <img src={organ.image || "fallback.jpg"} className="w-[350px] h-auto rounded-t-lg" />
+        </div>
+        <div>
+          <div className="flex justify-between p-3">
+            <div className="bg-red-200 flex items-center py-1 px-4 rounded-xl cursor-pointer">
+              <p>Blood Type: {organ.attributes.find(attr => attr.trait_type === "Blood Type")?.value || "N/A"}</p>
+            </div>
+            <div className="flex items-center">
+              <strong>Description: {organ.attributes.find(attr => attr.trait_type === "Description")?.value || "No description"}</strong>
+            </div>
+          </div>
+        </div>
+      </div>
+    ) : null
+  ))
+)}
+
+
+
         </div>
         </div>
 

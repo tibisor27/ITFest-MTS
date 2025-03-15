@@ -36,12 +36,12 @@ export default function AddOrgan({ organNFT, provider, account, donorAddress }) 
       image: "https://ipfs.io/ipfs/bafkreiduadulzcm27f7lo4kgeadyyszk5gbooviueikcydbjbgcearkjia",
       id: Date.now().toString(),
       attributes: [
-        { trait_type: "test", value: 20 },
-        { trait_type: "test1", value: "Condo" },
-        { trait_type: "test2", value: 2 },
-        { trait_type: "test3", value: 3 },
-        { trait_type: "test4", value: 2200 },
-        { trait_type: "test5", value: 2013 },
+        { trait_type: "NOU", value: 20 },
+        { trait_type: "NOU", value: "Condo" },
+        { trait_type: "nou", value: 2 },
+        { trait_type: "nou", value: 3 },
+        { trait_type: "nou", value: 2200 },
+        { trait_type: "nou", value: 2013 },
       ],
     };
 
