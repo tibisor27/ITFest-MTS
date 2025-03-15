@@ -37,9 +37,19 @@ function App() {
   const [patientData, setPatientData] = useState({
     address: "",
     name: "",
+    prenume: "",
+    cnp: "",
+    organType: "",
     bloodType: "",
     sex: "",
     age: "",
+    greutate: "",
+    inaltime: "",
+    istoricMedical:"",
+    deseaseSeverity: "",
+    surgicalRisk: "",
+    medicalHistory: "",
+    
   });
   const [decryptedPatientData, setDecryptedPatientData] = useState(null);
 
@@ -369,6 +379,34 @@ const findPatientByCriteria = async (criteria) => {
         />
       </div>
 
+        {/* prenumele pacientului */}
+        <div className="mb-4">
+        <label className="block text-sm font-medium mb-1">Prenume</label>
+        <input
+          type="text"
+          name="prenume"
+          value={patientData.prenume}
+          onChange={handleInputChange}
+          className="w-full p-2 border rounded-md"
+          placeholder="Enter patient's first name"
+          required
+        />
+      </div>
+
+          {/* cnpul pacientului */}
+          <div className="mb-4">
+        <label className="block text-sm font-medium mb-1">CNP</label>
+        <input
+          type="text"
+          name="cnp"
+          value={patientData.cnp}
+          onChange={handleInputChange}
+          className="w-full p-2 border rounded-md"
+          placeholder="Enter patient's cnp"
+          required
+        />
+      </div>
+
       {/* Grupa sanguină */}
       <div className="mb-4">
         <label className="block text-sm font-medium mb-1">Blood Type</label>
@@ -420,6 +458,83 @@ const findPatientByCriteria = async (criteria) => {
           placeholder="Enter patient's age"
           required
         />
+      </div>
+
+        {/* greutatea pacientului */}
+        <div className="mb-4">
+        <label className="block text-sm font-medium mb-1">Greutate</label>
+        <input
+          type="text"
+          name="greutate"
+          value={patientData.greutate}
+          onChange={handleInputChange}
+          className="w-full p-2 border rounded-md"
+          placeholder="Enter patient's wieght"
+          required
+        />
+      </div>
+
+      {/* organType */}
+      <div className="mb-4">
+        <label className="block text-sm font-medium mb-1">Organ</label>
+        <input
+          type="text"
+          name="organType"
+          value={patientData.organType}
+          onChange={handleInputChange}
+          className="w-full p-2 border rounded-md"
+          placeholder="Enter patient's organ type"
+          required
+        />
+      </div>
+
+        {/* Risc chirurgical */}
+        <div className="mb-4">
+        <label className="block text-sm font-medium mb-1">Surgical Risk</label>
+        <select
+          name="surgicalRisk"
+          value={patientData.surgicalRisk}
+          onChange={handleInputChange}
+          className="w-full p-2 border rounded-md"
+          required
+        >
+          <option value="">Select risk level</option>
+          <option value="Low">Low</option>
+          <option value="Moderate">Moderate</option>
+          <option value="High">High</option>
+        </select>
+      </div>
+
+       {/* Gravitatea bolii */}
+       <div className="mb-4">
+        <label className="block text-sm font-medium mb-1">Disease Severity</label>
+        <select
+          name="diseaseSeverity"
+          value={patientData.diseaseSeverity}
+          onChange={handleInputChange}
+          className="w-full p-2 border rounded-md"
+          required
+        >
+          <option value="">Select severity</option>
+          <option value="Mild">Mild</option>
+          <option value="Moderate">Moderate</option>
+          <option value="Severe">Severe</option>
+          <option value="Critical">Critical</option>
+        </select>
+      </div>
+
+      {/* Istoric medical */}
+      <div className="mb-4">
+        <label className="block text-sm font-medium mb-1">Medical History</label>
+        <textarea
+          name="medicalHistory"
+          value={patientData.medicalHistory}
+          onChange={handleInputChange}
+          className="w-full p-2 border rounded-md"
+          placeholder="Enter patient's medical history"
+          rows="3"
+          required
+        ></textarea>
       </div>
 
       {/* Butoane pentru trimitere și anulare */}
