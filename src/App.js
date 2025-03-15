@@ -44,6 +44,7 @@ function App() {
       await provider.send("eth_requestAccounts", []);
       const signer = provider.getSigner();
       const account = await signer.getAddress();
+      console.log("🔑 Conectat cu adresa:", account);
   
       setAccount(account);
       setProvider(provider);
@@ -107,7 +108,17 @@ function App() {
       const patientList = await patientRegistry.getPatientList();
       setPatients(patientList);
       console.log("✅ Patients loaded:", patientList);
-  
+      const patientDataPromises = patientList.map(async (address) => {
+        const patient = await patientRegistry.patients(address);
+        return {
+          address: address,
+          info: patient.patientInfo,
+        };
+      });
+      const allPatientData = await Promise.all(patientDataPromises);
+
+      console.log("All Patient Data:", allPatientData);
+      return allPatientData;
       // 🔥 Apelează fetchDonorAddress DOAR după ce organNFT este setat!
       await fetchDonorAddress(organNFT);
   
@@ -164,9 +175,8 @@ const addPatientHandler = async () => {
 
   try {
     const signer = provider.getSigner();
-    console.log("🔐 Semnatarul:", signer);
     const patientRegistryWithSigner = patientRegistry.connect(signer);
-
+    console.log("patientRegistryWithSigner!!!!", patientRegistryWithSigner.address);
     const tx = await patientRegistryWithSigner.addPatient(patientAddress, patientInfo);
     await tx.wait(); // 🔥 Așteptăm confirmarea tranzacției
     alert(`Patient ${patientAddress} added successfully`);
