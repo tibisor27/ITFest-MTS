@@ -29,6 +29,31 @@ function App() {
   const [patientRegistry, setPatientRegistry] = useState(null);
   const [patients, setPatients] = useState([]); // Lista pacienților adăugați
   const [donorAddress, setDonorAddress] = useState(null);
+  const [showForm, setShowForm] = useState(false); // Stare pentru a afișa/ascunde formularul
+  const [patientData, setPatientData] = useState({
+    address: "",
+    name: "",
+    bloodType: "",
+    sex: "",
+    age: "",
+  });
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setPatientData((prevData) => ({
+      ...prevData,
+      [name]: value,
+    }));
+    console.log(`Updated ${name}:`, value); // Afișează câmpul actualizat
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    console.log("Patient Data to be submitted:", patientData); // Afișează datele pacientului
+    const { address, ...details } = patientData;
+    await addPatientHandler(address, details);
+    setShowForm(false);
+    setPatientData({ address: "", name: "", bloodType: "", sex: "", age: "" });
+  };
 
 
   const loadBlockchainData = async () => {
@@ -153,7 +178,7 @@ function App() {
   
 
 
-const addPatientHandler = async () => {
+const addPatientHandler = async (patientAddress, patientInfo) => {
   if (!account) {
     alert("Please connect your wallet.");
     return;
@@ -165,19 +190,21 @@ const addPatientHandler = async () => {
     return;
   }
 
-  const patientAddress = prompt("Enter patient's address:");
   if (!ethers.utils.isAddress(patientAddress)) {
     alert("Invalid address.");
     return;
   }
 
-  const patientInfo = prompt("Enter patient information:");
 
   try {
     const signer = provider.getSigner();
     const patientRegistryWithSigner = patientRegistry.connect(signer);
 
     const tx = await patientRegistryWithSigner.addPatient(patientAddress, patientInfo);
+    console.log("adresa pacient:", patientAddress)
+    console.log("patiennt info:", patientInfo)
+    console.log("patiennt data:", patientData)
+
     await tx.wait(); // 🔥 Așteptăm confirmarea tranzacției
     alert(`Patient ${patientAddress} added successfully`);
 
@@ -226,18 +253,120 @@ const addPatientHandler = async () => {
       
       {/* Buton pentru a adăuga pacienti */}
       {account && (
-        <div>
-          <button
-            onClick={addPatientHandler}
-            className="bg-green-500 text-white p-2 rounded-md"
-          >
-            Add Patient
-          </button>
+  <div>
+    <button
+      onClick={() => setShowForm(true)}
+      className="bg-green-500 text-white p-2 rounded-md"
+    >
+      Add Patient
+    </button>
 
-          
+    {showForm && (
+  <div className="mt-4 p-4 border rounded-lg bg-gray-100">
+    <h3 className="text-lg font-bold mb-2">Add New Patient</h3>
+    <form onSubmit={handleSubmit}>
+      {/* Adresa pacientului */}
+      <div className="mb-4">
+        <label className="block text-sm font-medium mb-1">Patient Address</label>
+        <input
+          type="text"
+          name="address"
+          value={patientData.address}
+          onChange={handleInputChange}
+          className="w-full p-2 border rounded-md"
+          placeholder="Enter patient's address"
+          required
+        />
+      </div>
 
-        </div>
-      )}
+      {/* Numele pacientului */}
+      <div className="mb-4">
+        <label className="block text-sm font-medium mb-1">Name</label>
+        <input
+          type="text"
+          name="name"
+          value={patientData.name}
+          onChange={handleInputChange}
+          className="w-full p-2 border rounded-md"
+          placeholder="Enter patient's name"
+          required
+        />
+      </div>
+
+      {/* Grupa sanguină */}
+      <div className="mb-4">
+        <label className="block text-sm font-medium mb-1">Blood Type</label>
+        <select
+          name="bloodType"
+          value={patientData.bloodType}
+          onChange={handleInputChange}
+          className="w-full p-2 border rounded-md"
+          required
+        >
+          <option value="">Select blood type</option>
+          <option value="A+">A+</option>
+          <option value="A-">A-</option>
+          <option value="B+">B+</option>
+          <option value="B-">B-</option>
+          <option value="AB+">AB+</option>
+          <option value="AB-">AB-</option>
+          <option value="O+">O+</option>
+          <option value="O-">O-</option>
+        </select>
+      </div>
+
+      {/* Sexul pacientului */}
+      <div className="mb-4">
+        <label className="block text-sm font-medium mb-1">Sex</label>
+        <select
+          name="sex"
+          value={patientData.sex}
+          onChange={handleInputChange}
+          className="w-full p-2 border rounded-md"
+          required
+        >
+          <option value="">Select sex</option>
+          <option value="Male">Male</option>
+          <option value="Female">Female</option>
+          <option value="Other">Other</option>
+        </select>
+      </div>
+
+      {/* Vârsta pacientului */}
+      <div className="mb-4">
+        <label className="block text-sm font-medium mb-1">Age</label>
+        <input
+          type="number"
+          name="age"
+          value={patientData.age}
+          onChange={handleInputChange}
+          className="w-full p-2 border rounded-md"
+          placeholder="Enter patient's age"
+          required
+        />
+      </div>
+
+      {/* Butoane pentru trimitere și anulare */}
+      <div className="flex justify-end">
+        <button
+          type="button"
+          onClick={() => setShowForm(false)}
+          className="mr-2 bg-gray-500 text-white p-2 rounded-md"
+        >
+          Cancel
+        </button>
+        <button
+          type="submit"
+          className="bg-green-500 text-white p-2 rounded-md"
+        >
+          Add Patient
+        </button>
+      </div>
+    </form>
+  </div>
+)}
+  </div>
+)}
 
       
 
@@ -295,8 +424,16 @@ const addPatientHandler = async () => {
       </div>
 
       {toggle && (
-        <Home organ={organ} provider={provider} account={account} escrow={escrow} togglePop={togglePop} />
-      )}
+  <Home 
+    organ={organ}  // 👈 Trimitem organul selectat
+    provider={provider} 
+    account={account} 
+    escrow={escrow} 
+    togglePop={togglePop} 
+    organs={organs} 
+  />
+)}
+
     </div>
   );
 }

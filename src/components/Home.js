@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 
-const Home = ({ provider, account, escrow, togglePop }) => {
+const Home = ({ provider, account, escrow, togglePop, organ }) => {
   const [donor, setDonor] = useState(null);
   const [patient, setPatient] = useState(null);
   const [doctor, setDoctor] = useState(null);
@@ -8,7 +8,7 @@ const Home = ({ provider, account, escrow, togglePop }) => {
   const [doctorApproved, setDoctorApproved] = useState(false);
   const [currentOwner, setCurrentOwner] = useState(null);
   const [futureOwner, setFutureOwner] = useState(null);
-  const [organData, setOrganData] = useState(null);
+
 
 
   // Funcție pentru a prelua detalii despre transplant
@@ -28,6 +28,7 @@ const Home = ({ provider, account, escrow, togglePop }) => {
     setDoctorApproved(doctorApproved);
     setCurrentOwner(owners[0]);
     setFutureOwner(owners[1]);
+
   };
 
   useEffect(() => {
@@ -128,7 +129,25 @@ const Home = ({ provider, account, escrow, togglePop }) => {
         <p><strong>Doctor Approval:</strong> {doctorApproved ? "✅ Approved" : "❌ Not Approved"}</p>
         <p><strong>Current NFT Owner:</strong> {currentOwner ? `${currentOwner.slice(0, 6)}...${currentOwner.slice(-4)}` : "Loading..."}</p>
         <p><strong>Future NFT Owner:</strong> {futureOwner ? `${futureOwner.slice(0, 6)}...${futureOwner.slice(-4)}` : "Not assigned yet"}</p>
-
+      {/* 🔥 Afișează și datele despre NFT */}
+      {organ && (  // ✅ Acum organul este primit corect și folosit
+          <div className="mt-5 flex">
+            <h3 className="text-xl font-bold">Organ Details</h3>
+            <img src={organ.image || "fallback.jpg"} className="w-[350px] h-auto rounded-t-lg" />
+            <p><strong>Organ:</strong> {organ.organ || "N/A"}</p>
+            <p><strong>Blood Type:</strong> {organ.BloodType || organ.attributes?.find(attr => attr.trait_type === "Blood Type")?.value || "N/A"}</p>
+            <p><strong>Description:</strong> {organ.description || "No description"}</p>
+            {/* Afișează toate atributele disponibile */}
+            <div className="mt-2 flex">
+              <strong>Attributes:</strong>
+              <ul>
+              {organ.attributes?.map((attr, i) => (
+                  <li key={i}>{attr.trait_type}: {attr.value}</li>
+                ))}
+              </ul>
+            </div>
+          </div>
+        )}
         <div className="flex flex-col gap-3 mt-5">
           {account === donor && (
             <button onClick={() => setPatientHandler(prompt("Enter patient's address:"))}

@@ -39,9 +39,9 @@ if (doctor.address !== doctorFromContract) {
 }
 
 
-const addPatientTx = await patientRegistry.connect(doctor).addPatient(patient.address, "Patient Info Here");
-await addPatientTx.wait();
-console.log(`✅ Patient ${patient.address} added to registry`);
+// const addPatientTx = await patientRegistry.connect(doctor).addPatient(patient.address, "Patient Info Here");
+// await addPatientTx.wait();
+// console.log(`✅ Patient ${patient.address} added to registry`);
 
 
 
