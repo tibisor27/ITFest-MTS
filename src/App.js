@@ -467,9 +467,7 @@ const findPatientByCriteria = async (criteria) => {
   </ul>
 
   {/* Afișează datele decriptate ale pacientului */}
-  {decryptedPatientData && (
-    <div className="mt-4 p-4 border rounded-lg bg-gray-100">
-        <button
+  <button
     onClick={async () => {
       const foundPatient = await findPatientByCriteria({ bloodType: "B+" });
       if (foundPatient) {
@@ -482,6 +480,9 @@ const findPatientByCriteria = async (criteria) => {
   >
     Find First B+ Patient
   </button>
+  {decryptedPatientData && (
+    <div className="mt-4 p-4 border rounded-lg bg-gray-100">
+
       <h3 className="text-lg font-bold mb-2">Patient Details</h3>
       <p><strong>Name:</strong> {decryptedPatientData.name}</p>
       <p><strong>Blood Type:</strong> {decryptedPatientData.bloodType}</p>
@@ -530,16 +531,18 @@ const findPatientByCriteria = async (criteria) => {
 
       </div>
 
-      {toggle && (
+{toggle && (
   <Home 
-    organ={organ}  // 👈 Trimitem organul selectat
+    organ={organ}  
     provider={provider} 
     account={account} 
     escrow={escrow} 
     togglePop={togglePop} 
     organs={organs} 
+    findPatientByCriteria={findPatientByCriteria} // 🔥 Adăugat aici!
   />
 )}
+
 
     </div>
   );

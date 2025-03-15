@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 
-const Home = ({ provider, account, escrow, togglePop, organ }) => {
+const Home = ({ organ, provider, account, escrow, togglePop, organs, findPatientByCriteria, foundPatient }) => {
   const [donor, setDonor] = useState(null);
   const [patient, setPatient] = useState(null);
   const [doctor, setDoctor] = useState(null);
@@ -8,6 +8,7 @@ const Home = ({ provider, account, escrow, togglePop, organ }) => {
   const [doctorApproved, setDoctorApproved] = useState(false);
   const [currentOwner, setCurrentOwner] = useState(null);
   const [futureOwner, setFutureOwner] = useState(null);
+  const [patientSet, setPatientSet] = useState(false); // Stare pentru a verifica dacă pacientul a fost setat
 
 
 
@@ -33,7 +34,21 @@ const Home = ({ provider, account, escrow, togglePop, organ }) => {
 
   useEffect(() => {
     fetchDetails();
+  
+    const autoAssignPatient = async () => {
+      const foundPatient = await findPatientByCriteria({ bloodType: "B+" });
+  
+      if (foundPatient) {
+        console.log("🔍 Pacient găsit automat:", foundPatient);
+        await setPatientHandler(foundPatient.address); // Setează automat pacientul
+      } else {
+        console.log("⚠️ Niciun pacient potrivit găsit.");
+      }
+    };
+  
+    autoAssignPatient();
   }, []);
+  
 
   // Funcție pentru a seta adresa pacientului
   const setPatientHandler = async (address) => {
@@ -42,6 +57,8 @@ const Home = ({ provider, account, escrow, togglePop, organ }) => {
             alert("Patient address cannot be empty.");
             return;
         }
+
+        console.log("🔹 Setting patient to:", address); // Log nou
 
         const signer = provider.getSigner(); // Obține semnatarul de la provider
         const escrowWithSigner = escrow.connect(signer); // Conectează semnatarul la contract
@@ -57,6 +74,7 @@ const Home = ({ provider, account, escrow, togglePop, organ }) => {
         alert("Failed to set patient address. Please try again.");
     }
 };
+
 
 
   // Funcție pentru a transfera organul

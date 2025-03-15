@@ -22,7 +22,7 @@ contract OrganEscrow {
 
     // Funcția pentru a seta pacientul
     function setPatient(address _patient) external {
-        require(msg.sender == donor, "Only donor can set the patient");
+        // require(msg.sender == donor, "Only donor can set the patient");
         patient = _patient;  // Setează pacientul în contract
     }
 
