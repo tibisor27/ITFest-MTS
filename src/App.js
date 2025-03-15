@@ -3,6 +3,8 @@ import { ethers } from "ethers"; // Asigură-te că folosești v5 corect instala
 import logo from "./assets/logo1.png";
 import AddOrgan from "./components/AddOrgan";
 import { uploadToPinata } from "./utils/pinata";
+import CryptoJS from "crypto-js";
+
 
 
 // ABIs
@@ -17,6 +19,8 @@ import Navigation from "./components/Navigation";
 import Search from "./components/Search";
 import Home from "./components/Home";
 
+
+const secretKey = "rosibes2712";
 function App() {
   const [account, setAccount] = useState(null);
   const [provider, setProvider] = useState(null);
@@ -37,6 +41,8 @@ function App() {
     sex: "",
     age: "",
   });
+  const [decryptedPatientData, setDecryptedPatientData] = useState(null);
+
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setPatientData((prevData) => ({
@@ -177,6 +183,11 @@ function App() {
   };
   
 
+  const encryptData = (data, secret) => {
+    return CryptoJS.AES.encrypt(JSON.stringify(data), secret).toString();
+  };
+  
+
 
 const addPatientHandler = async (patientAddress, patientInfo) => {
   if (!account) {
@@ -197,13 +208,16 @@ const addPatientHandler = async (patientAddress, patientInfo) => {
 
 
   try {
+    const encryptedPatientInfo = encryptData(patientInfo, secretKey);
+
     const signer = provider.getSigner();
     const patientRegistryWithSigner = patientRegistry.connect(signer);
 
-    const tx = await patientRegistryWithSigner.addPatient(patientAddress, patientInfo);
+    const tx = await patientRegistryWithSigner.addPatient(patientAddress, encryptedPatientInfo);
     console.log("adresa pacient:", patientAddress)
     console.log("patiennt info:", patientInfo)
     console.log("patiennt data:", patientData)
+    console.log("ecnrypted patient info:", encryptedPatientInfo)
 
     await tx.wait(); // 🔥 Așteptăm confirmarea tranzacției
     alert(`Patient ${patientAddress} added successfully`);
@@ -219,6 +233,41 @@ const addPatientHandler = async (patientAddress, patientInfo) => {
 
 
 };
+
+const decryptData = (encryptedData, secret) => {
+  try {
+    const bytes = CryptoJS.AES.decrypt(encryptedData, secret);
+    return JSON.parse(bytes.toString(CryptoJS.enc.Utf8));
+  } catch (error) {
+    console.error("Decryption failed:", error);
+    return null;
+  }
+};
+
+// Exemplu de utilizare pentru a afișa detaliile pacientului
+const fetchPatientData = async (patientAddress) => {
+  const userInputKey = prompt("Enter the secret key to view details:");
+
+  if (userInputKey !== secretKey) {
+    alert("Incorrect secret key!");
+    return;
+  }
+
+  try {
+    const patient = await patientRegistry.patients(patientAddress);
+    const decryptedData = decryptData(patient.patientInfo, secretKey);
+
+    if (decryptedData) {
+      setDecryptedPatientData(decryptedData);
+      console.log("Decrypted Patient Data:", decryptedData);
+    } else {
+      alert("Failed to decrypt patient data.");
+    }
+  } catch (error) {
+    console.error("Error fetching patient data:", error);
+  }
+};
+
 
 
 
@@ -371,19 +420,37 @@ const addPatientHandler = async (patientAddress, patientInfo) => {
       
 
 <div className="mt-5">
-    <h3 className="text-xl font-bold">Patients List</h3>
-    <ul className="list-disc mt-2">
-      {patients.length === 0 ? (
-        <li>No patients added yet.</li>
-      ) : (
-        patients.map((patientAddress, index) => (
-          <li key={index}>
-            <p>{`${patientAddress.slice(0, 6)}...${patientAddress.slice(-4)}`}</p>
-          </li>
-        ))
-      )}
-    </ul>
-  </div>
+  <h3 className="text-xl font-bold">Patients List</h3>
+  <ul className="list-disc mt-2">
+    {patients.length === 0 ? (
+      <li>No patients added yet.</li>
+    ) : (
+      patients.map((patientAddress, index) => (
+        <li key={index} className="flex items-center space-x-4">
+          <p>{`${patientAddress.slice(0, 6)}...${patientAddress.slice(-4)}`}</p>
+          <button
+            onClick={() => fetchPatientData(patientAddress)}
+            className="bg-blue-500 text-white p-1 rounded-md text-sm"
+          >
+            View Details
+          </button>
+        </li>
+      ))
+    )}
+  </ul>
+
+  {/* Afișează datele decriptate ale pacientului */}
+  {decryptedPatientData && (
+    <div className="mt-4 p-4 border rounded-lg bg-gray-100">
+      <h3 className="text-lg font-bold mb-2">Patient Details</h3>
+      <p><strong>Name:</strong> {decryptedPatientData.name}</p>
+      <p><strong>Blood Type:</strong> {decryptedPatientData.bloodType}</p>
+      <p><strong>Sex:</strong> {decryptedPatientData.sex}</p>
+      <p><strong>Age:</strong> {decryptedPatientData.age}</p>
+    </div>
+  )}
+</div>
+
 
   <div className="p-7 flex flex-col gap-y-6 items-center">
   <p className="text-4xl font-bold">Organs For You</p>
