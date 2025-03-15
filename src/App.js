@@ -3,6 +3,7 @@ import { ethers } from "ethers"; // Asigură-te că folosești v5 corect instala
 import logo from "./assets/logo1.png";
 import AddOrgan from "./components/AddOrgan";
 import { uploadToPinata } from "./utils/pinata";
+import { AES } from "crypto-js";
 
 
 // ABIs
@@ -104,7 +105,7 @@ function App() {
 
       console.log("✅ Organs loaded:", fetchedOrgans);
   
-      // Load patients
+      // Load patients cu informatii
       const patientList = await patientRegistry.getPatientList();
       setPatients(patientList);
       console.log("✅ Patients loaded:", patientList);
@@ -113,6 +114,9 @@ function App() {
         return {
           address: address,
           info: patient.patientInfo,
+          bloodType: patient.bloodType,
+          diseaseSeverity: patient.diseaseSeverity,
+          surgicalRisk: patient.surgicalRisk,
         };
       });
       const allPatientData = await Promise.all(patientDataPromises);
@@ -172,12 +176,26 @@ const addPatientHandler = async () => {
   }
 
   const patientInfo = prompt("Enter patient information:");
+  const bloodType = prompt("Enter patient bloodType:");
+  const diseaseSeverity = prompt("Enter patient diseaseSeverity:");
+  const surgicalRisk = prompt("Enter patient surgicalRisk:");
+
+    console.log("Original Data:");
+  console.log("Patient Info:", patientInfo);
+  console.log("Blood Type:", bloodType);
+  console.log("Disease Severity:", diseaseSeverity);
+  console.log("Surgical Risk:", surgicalRisk);
+    const secretKey = "your-secret-key";  // Cheia secretă folosită pentru criptare
+  const encryptedInfo = AES.encrypt(patientInfo, secretKey).toString();  // Criptăm info pacientului
+  const encryptedBloodType = AES.encrypt(bloodType, secretKey).toString();  // Criptăm bloodType
+  const encryptedDiseaseSeverity = AES.encrypt(diseaseSeverity, secretKey).toString();  // Criptăm diseaseSeverity
+  const encryptedSurgicalRisk = AES.encrypt(surgicalRisk, secretKey).toString();  // Criptăm surgicalRisk
 
   try {
     const signer = provider.getSigner();
     const patientRegistryWithSigner = patientRegistry.connect(signer);
     console.log("patientRegistryWithSigner!!!!", patientRegistryWithSigner.address);
-    const tx = await patientRegistryWithSigner.addPatient(patientAddress, patientInfo);
+    const tx = await patientRegistryWithSigner.addPatient(patientAddress, patientInfo,bloodType,diseaseSeverity,surgicalRisk);
     await tx.wait(); // 🔥 Așteptăm confirmarea tranzacției
     alert(`Patient ${patientAddress} added successfully`);
 

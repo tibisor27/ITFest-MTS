@@ -21,6 +21,21 @@
                 "internalType": "string",
                 "name": "info",
                 "type": "string"
+            },
+            {
+                "internalType": "uint256",
+                "name": "bloodType",
+                "type": "uint256"
+            },
+            {
+                "internalType": "uint256",
+                "name": "diseaseSeverity",
+                "type": "uint256"
+            },
+            {
+                "internalType": "uint256",
+                "name": "surgicalRisk",
+                "type": "uint256"
             }
         ],
         "name": "addPatient",
@@ -92,6 +107,21 @@
                 "internalType": "string",
                 "name": "patientInfo",
                 "type": "string"
+            },
+            {
+                "internalType": "uint256",
+                "name": "bloodType",
+                "type": "uint256"
+            },
+            {
+                "internalType": "uint256",
+                "name": "diseaseSeverity",
+                "type": "uint256"
+            },
+            {
+                "internalType": "uint256",
+                "name": "surgicalRisk",
+                "type": "uint256"
             }
         ],
         "stateMutability": "view",

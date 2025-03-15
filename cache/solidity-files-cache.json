@@ -660,8 +660,8 @@
       "artifacts": []
     },
     "/Users/tibisor/Desktop/ITFest-MTS/contracts/PatientRegistry.sol": {
-      "lastModificationDate": 1742037017865,
-      "contentHash": "c9105edbcfe5df3bb5c5ab98044eb6e4",
+      "lastModificationDate": 1742043391161,
+      "contentHash": "8b5c40815d42fa9ccb14e282c42ac864",
       "sourceName": "contracts/PatientRegistry.sol",
       "solcConfig": {
         "version": "0.8.17",
