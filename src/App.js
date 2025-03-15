@@ -142,7 +142,6 @@ function App() {
           alert("Nu s-a găsit niciun pacient cu diseaseSeverity valid.");
         }
       };
-      await selectPatientWithHighestSeverity();
       
       
       console.log("All Patient Data:", allPatientData);
@@ -243,10 +242,10 @@ const addPatientHandler = async () => {
   };
 
   return (
-    <div>
+    <div> {/* Împachetăm totul într-un singur div */}
       <Navigation account={account} setAccount={setAccount} />
       <Search />
-
+  
       <div className="p-7 flex flex-col gap-y-6 items-center">
         <p className="text-4xl font-bold">Organs For You</p>
         {account && organNFT && (
@@ -255,81 +254,74 @@ const addPatientHandler = async () => {
             <AddOrgan organNFT={organNFT} provider={provider} account={account} donorAddress={donorAddress} />
           </div>
         )}
-      {/* Buton pentru a adăuga pacienti */}
-      {account && (
-        <div>
-          <button
-            onClick={addPatientHandler}
-            className="bg-green-500 text-white p-2 rounded-md"
-          >
-            Add Patient
-          </button>
-
-          
-
-        </div>
-      )}
-
-      
-
-<div className="mt-5">
-    <h3 className="text-xl font-bold">Patients List</h3>
-    <ul className="list-disc mt-2">
-      {patients.length === 0 ? (
-        <li>No patients added yet.</li>
-      ) : (
-        patients.map((patientAddress, index) => (
-          <li key={index}>
-            <p>{`${patientAddress.slice(0, 6)}...${patientAddress.slice(-4)}`}</p>
-          </li>
-        ))
-      )}
-    </ul>
-  </div>
-  
-  <div className="p-7 flex flex-col gap-y-6 items-center">
-  <p className="text-4xl font-bold">Organs For You</p>
-  <div className="flex justify-center space-x-5 p-1">
-    {!organs.length ? (
-      <p>Loading...</p>
-    ) : (
-      organs.map((organ, index) => (
-        organ && organ.attributes ? (
-          <div key={index} className="rounded-lg shadow-xl" onClick={() => togglePop(organ)}>
-            <div>
-              <img src={organ.image || "fallback.jpg"} className="w-[350px] h-auto rounded-t-lg" />
-            </div>
-            <div className="p-3">
-              <p><strong>Organ:</strong> {organ.organ || "N/A"}</p>
-              <p><strong>Blood Type:</strong> {organ.BloodType || organ.attributes?.find(attr => attr.trait_type === "Blood Type")?.value || "N/A"}</p>
-              <p><strong>Description:</strong> {organ.description || "No description"}</p>
-              <p><strong>ID:</strong> {organ.id}</p>
-              
-              {/* Afișează toate atributele disponibile */}
-              <div className="mt-2">
-                <strong>Attributes:</strong>
-                <ul>
-                  {organ.attributes.map((attr, i) => (
-                    <li key={i}>{attr.trait_type}: {attr.value}</li>
-                  ))}
-                </ul>
-              </div>
-            </div>
+        {/* Buton pentru a adăuga pacienți */}
+        {account && (
+          <div>
+            <button
+              onClick={addPatientHandler}
+              className="bg-green-500 text-white p-2 rounded-md"
+            >
+              Add Patient
+            </button>
           </div>
-        ) : null
-      ))
-    )}
-  </div>
-</div>
-
-
+        )}
+  
+        <div className="mt-5">
+          <h3 className="text-xl font-bold">Patients List</h3>
+          <ul className="list-disc mt-2">
+            {patients.length === 0 ? (
+              <li>No patients added yet.</li>
+            ) : (
+              patients.map((patientAddress, index) => (
+                <li key={index}>
+                  <p>{`${patientAddress.slice(0, 6)}...${patientAddress.slice(-4)}`}</p>
+                </li>
+              ))
+            )}
+          </ul>
+        </div>
+      
+        <div className="p-7 flex flex-col gap-y-6 items-center">
+          <p className="text-4xl font-bold">Organs For You</p>
+          <div className="flex justify-center space-x-5 p-1">
+            {!organs.length ? (
+              <p>Loading...</p>
+            ) : (
+              organs.map((organ, index) => (
+                organ && organ.attributes ? (
+                  <div key={index} className="rounded-lg shadow-xl" onClick={() => togglePop(organ)}>
+                    <div>
+                      <img src={organ.image || "fallback.jpg"} className="w-[350px] h-auto rounded-t-lg" />
+                    </div>
+                    <div className="p-3">
+                      <p><strong>Organ:</strong> {organ.organ || "N/A"}</p>
+                      <p><strong>Blood Type:</strong> {organ.BloodType || organ.attributes?.find(attr => attr.trait_type === "Blood Type")?.value || "N/A"}</p>
+                      <p><strong>Description:</strong> {organ.description || "No description"}</p>
+                      <p><strong>ID:</strong> {organ.id}</p>
+                      {/* Afișează toate atributele disponibile */}
+                      <div className="mt-2">
+                        <strong>Attributes:</strong>
+                        <ul>
+                          {organ.attributes.map((attr, i) => (
+                            <li key={i}>{attr.trait_type}: {attr.value}</li>
+                          ))}
+                        </ul>
+                      </div>
+                    </div>
+                  </div>
+                ) : null
+              ))
+            )}
+          </div>
+        </div>
       </div>
-
+  
       {toggle && (
         <Home organ={organ} provider={provider} account={account} escrow={escrow} togglePop={togglePop} />
       )}
     </div>
   );
+  
 }
 
 export default App;
