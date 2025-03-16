@@ -156,7 +156,7 @@ const Home = ({ organ, provider, account, escrow, togglePop, organs, findPatient
             <h3 className="text-xl font-bold">Organ Details</h3>
             <img src={organ.image || "fallback.jpg"} className="w-[350px] h-auto rounded-t-lg" />
             <p><strong>Organ:</strong> {organ.organ || "N/A"}</p>
-            <p><strong>Blood Type:</strong> {organ.BloodType || organ.attributes?.find(attr => attr.trait_type === "Blood Type")?.value || "N/A"}</p>
+      
             <p><strong>Description:</strong> {organ.description || "No description"}</p>
             {/* Afișează toate atributele disponibile */}
             <div className="mt-2 flex">

@@ -48,10 +48,14 @@ if (doctor.address !== doctorFromContract) {
 
   console.log("Minting organ NFT...");
 
-  const mintTx = await organNFT.connect(donor).mintOrganNFT(
-    "https://ipfs.io/ipfs/bafkreieuvaq5m4ckzha6y43wsgrg7laf3hrqb2bmgyhl3gtqtqjbalzi3e"
-  );
+  // const mintTx = await organNFT.connect(donor).mintOrganNFT(
+  //   "https://ipfs.io/ipfs/bafkreieuvaq5m4ckzha6y43wsgrg7laf3hrqb2bmgyhl3gtqtqjbalzi3e"
+  // );
 
+  const mintTx = await organNFT.connect(donor).mintOrganNFT(
+    "https://ipfs.io/ipfs/bafkreicz3nnxkuvj7vaxaotzpun7mfzunv2adt6mc6udhgvugkkwyyhvoy"
+  );
+  
 
 
   const mintReceipt = await mintTx.wait();
