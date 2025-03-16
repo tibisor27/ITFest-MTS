@@ -293,11 +293,13 @@ const findPatientByCriteria = async (criteria) => {
       const patient = await patientRegistry.patients(patientAddress);
       const decryptedData = decryptData(patient.patientInfo, secretKey);
 
+
       if (decryptedData && decryptedData.bloodType === criteria.bloodType) {
         console.log("✅ Pacient găsit:", decryptedData);
         return { address: patientAddress, ...decryptedData };
       }
     }
+
 
     console.warn("⚠️ Niciun pacient nu corespunde criteriului.");
     return null;
@@ -474,6 +476,20 @@ const findPatientByCriteria = async (criteria) => {
         />
       </div>
 
+        {/* greutatea pacientului */}
+        <div className="mb-4">
+        <label className="block text-sm font-medium mb-1">Inaltime</label>
+        <input
+          type="text"
+          name="inaltime"
+          value={patientData.inaltime}
+          onChange={handleInputChange}
+          className="w-full p-2 border rounded-md"
+          placeholder="Enter patient's height"
+          required
+        />
+      </div>
+
       {/* organType */}
       <div className="mb-4">
         <label className="block text-sm font-medium mb-1">Organ</label>
@@ -597,12 +613,20 @@ const findPatientByCriteria = async (criteria) => {
   </button>
   {decryptedPatientData && (
     <div className="mt-4 p-4 border rounded-lg bg-gray-100">
-
       <h3 className="text-lg font-bold mb-2">Patient Details</h3>
       <p><strong>Name:</strong> {decryptedPatientData.name}</p>
+      <p><strong>First Name:</strong> {decryptedPatientData.prenume}</p>
       <p><strong>Blood Type:</strong> {decryptedPatientData.bloodType}</p>
+      <p><strong>CNP:</strong> {decryptedPatientData.cnp}</p>
       <p><strong>Sex:</strong> {decryptedPatientData.sex}</p>
       <p><strong>Age:</strong> {decryptedPatientData.age}</p>
+      <p><strong>Weight:</strong> {decryptedPatientData.inaltime}</p>
+      <p><strong>Weight:</strong> {decryptedPatientData.greutate}</p>
+      <p><strong>Organ Needen:</strong> {decryptedPatientData.organType}</p>
+      <p><strong>surgicalRisk:</strong> {decryptedPatientData.surgicalRisk}</p>
+      <p><strong>diseaseSeverity:</strong> {decryptedPatientData.diseaseSeverity}</p>
+      <p><strong>istoricMedical:</strong> {decryptedPatientData.medicalHistory}</p>
+
     </div>
   )}
 </div>
