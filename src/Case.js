@@ -455,266 +455,273 @@ const findMatchingPatientForOrgan = async (organNFT) => {
  
 
       <div className="p-7 flex flex-col gap-y-6 items-center">
-  <p className="text-4xl font-bold">Organs For You</p>
-
-
-
-
 
       
       {/* Buton pentru a adăuga pacienti */}
       {account && (
   <div>
-    <button
-      onClick={() => setShowForm(true)}
-      className="bg-green-500 text-white p-2 rounded-md"
-    >
-      Add Patient
-    </button>
+  <button
+    onClick={() => setShowForm(true)}
+    className="bg-green-500 text-white p-2 rounded-md mb-5 mt-5"
+  >
+    Add Patient
+  </button>
 
-    {showForm && (
-  <div className="mt-4 p-4 border rounded-lg bg-gray-100">
-    <h3 className="text-lg font-bold mb-2">Add New Patient</h3>
-    <form onSubmit={handleSubmit}>
-      {/* Adresa pacientului */}
-      <div className="mb-4">
-        <label className="block text-sm font-medium mb-1">Patient Address</label>
-        <input
-          type="text"
-          name="address"
-          value={patientData.address}
-          onChange={handleInputChange}
-          className="w-full p-2 border rounded-md"
-          placeholder="Enter patient's address"
-          required
-        />
-      </div>
+  {showForm && (
+    <div className="mt-4 p-4 border rounded-lg bg-gray-100">
+      <h3 className="text-lg font-bold mb-4">Add New Patient</h3>
+      <form onSubmit={handleSubmit}>
+        {/* Container pentru două coloane */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {/* Coloana 1 */}
+          <div>
+            {/* Adresa pacientului */}
+            <div className="mb-4">
+              <label className="block text-sm font-medium mb-1">Patient Address</label>
+              <input
+                type="text"
+                name="address"
+                value={patientData.address}
+                onChange={handleInputChange}
+                className="w-full p-2 border rounded-md"
+                placeholder="Enter patient's address"
+                required
+              />
+            </div>
 
-      {/* Numele pacientului */}
-      <div className="mb-4">
-        <label className="block text-sm font-medium mb-1">Name</label>
-        <input
-          type="text"
-          name="name"
-          value={patientData.name}
-          onChange={handleInputChange}
-          className="w-full p-2 border rounded-md"
-          placeholder="Enter patient's name"
-          required
-        />
-      </div>
+            {/* Numele pacientului */}
+            <div className="mb-4">
+              <label className="block text-sm font-medium mb-1">Name</label>
+              <input
+                type="text"
+                name="name"
+                value={patientData.name}
+                onChange={handleInputChange}
+                className="w-full p-2 border rounded-md"
+                placeholder="Enter patient's name"
+                required
+              />
+            </div>
 
-        {/* prenumele pacientului */}
+            {/* Prenumele pacientului */}
+            <div className="mb-4">
+              <label className="block text-sm font-medium mb-1">Prenume</label>
+              <input
+                type="text"
+                name="prenume"
+                value={patientData.prenume}
+                onChange={handleInputChange}
+                className="w-full p-2 border rounded-md"
+                placeholder="Enter patient's first name"
+                required
+              />
+            </div>
+
+            {/* CNP-ul pacientului */}
+            <div className="mb-4">
+              <label className="block text-sm font-medium mb-1">CNP</label>
+              <input
+                type="text"
+                name="cnp"
+                value={patientData.cnp}
+                onChange={handleInputChange}
+                className="w-full p-2 border rounded-md"
+                placeholder="Enter patient's CNP"
+                required
+              />
+            </div>
+
+            {/* Grupa sanguină */}
+            <div className="mb-4">
+              <label className="block text-sm font-medium mb-1">Blood Type</label>
+              <select
+                name="bloodType"
+                value={patientData.bloodType}
+                onChange={handleInputChange}
+                className="w-full p-2 border rounded-md"
+                required
+              >
+                <option value="">Select blood type</option>
+                <option value="A+">A+</option>
+                <option value="A-">A-</option>
+                <option value="B+">B+</option>
+                <option value="B-">B-</option>
+                <option value="AB+">AB+</option>
+                <option value="AB-">AB-</option>
+                <option value="O+">O+</option>
+                <option value="O-">O-</option>
+              </select>
+            </div>
+
+            {/* Sexul pacientului */}
+            <div className="mb-4">
+              <label className="block text-sm font-medium mb-1">Sex</label>
+              <select
+                name="sex"
+                value={patientData.sex}
+                onChange={handleInputChange}
+                className="w-full p-2 border rounded-md"
+                required
+              >
+                <option value="">Select sex</option>
+                <option value="Male">Male</option>
+                <option value="Female">Female</option>
+                <option value="Other">Other</option>
+              </select>
+            </div>
+          </div>
+
+          {/* Coloana 2 */}
+          <div>
+            {/* Vârsta pacientului */}
+            <div className="mb-4">
+              <label className="block text-sm font-medium mb-1">Age</label>
+              <input
+                type="number"
+                name="age"
+                value={patientData.age}
+                onChange={handleInputChange}
+                className="w-full p-2 border rounded-md"
+                placeholder="Enter patient's age"
+                required
+              />
+            </div>
+
+            {/* Greutatea pacientului */}
+            <div className="mb-4">
+              <label className="block text-sm font-medium mb-1">Greutate</label>
+              <input
+                type="text"
+                name="greutate"
+                value={patientData.greutate}
+                onChange={handleInputChange}
+                className="w-full p-2 border rounded-md"
+                placeholder="Enter patient's weight"
+                required
+              />
+            </div>
+
+            {/* Înălțimea pacientului */}
+            <div className="mb-4">
+              <label className="block text-sm font-medium mb-1">Inaltime</label>
+              <input
+                type="text"
+                name="inaltime"
+                value={patientData.inaltime}
+                onChange={handleInputChange}
+                className="w-full p-2 border rounded-md"
+                placeholder="Enter patient's height"
+                required
+              />
+            </div>
+
+            {/* Tipul organului necesar */}
+            <div className="mb-4">
+              <label className="block text-sm font-medium mb-1">Organ</label>
+              <input
+                type="text"
+                name="organType"
+                value={patientData.organType}
+                onChange={handleInputChange}
+                className="w-full p-2 border rounded-md"
+                placeholder="Enter patient's organ type"
+                required
+              />
+            </div>
+
+            {/* Risc chirurgical */}
+            <div className="mb-4">
+              <label className="block text-sm font-medium mb-1">Surgical Risk</label>
+              <select
+                name="surgicalRisk"
+                value={patientData.surgicalRisk}
+                onChange={handleInputChange}
+                className="w-full p-2 border rounded-md"
+                required
+              >
+                <option value="">Select risk level</option>
+                <option value="Low">Low</option>
+                <option value="Moderate">Moderate</option>
+                <option value="High">High</option>
+              </select>
+            </div>
+
+            {/* Gravitatea bolii */}
+            <div className="mb-4">
+              <label className="block text-sm font-medium mb-1">Disease Severity</label>
+              <select
+                name="diseaseSeverity"
+                value={patientData.diseaseSeverity}
+                onChange={handleInputChange}
+                className="w-full p-2 border rounded-md"
+                required
+              >
+                <option value="">Select severity</option>
+                <option value="Mild">Mild</option>
+                <option value="Moderate">Moderate</option>
+                <option value="Severe">Severe</option>
+                <option value="Critical">Critical</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        {/* Istoric medical (ocupă întreaga lățime) */}
         <div className="mb-4">
-        <label className="block text-sm font-medium mb-1">Prenume</label>
-        <input
-          type="text"
-          name="prenume"
-          value={patientData.prenume}
-          onChange={handleInputChange}
-          className="w-full p-2 border rounded-md"
-          placeholder="Enter patient's first name"
-          required
-        />
-      </div>
+          <label className="block text-sm font-medium mb-1">Medical History</label>
+          <textarea
+            name="medicalHistory"
+            value={patientData.medicalHistory}
+            onChange={handleInputChange}
+            className="w-full p-2 border rounded-md"
+            placeholder="Enter patient's medical history"
+            rows="3"
+            required
+          ></textarea>
+        </div>
 
-          {/* cnpul pacientului */}
-          <div className="mb-4">
-        <label className="block text-sm font-medium mb-1">CNP</label>
-        <input
-          type="text"
-          name="cnp"
-          value={patientData.cnp}
-          onChange={handleInputChange}
-          className="w-full p-2 border rounded-md"
-          placeholder="Enter patient's cnp"
-          required
-        />
-      </div>
-
-      {/* Grupa sanguină */}
-      <div className="mb-4">
-        <label className="block text-sm font-medium mb-1">Blood Type</label>
-        <select
-          name="bloodType"
-          value={patientData.bloodType}
-          onChange={handleInputChange}
-          className="w-full p-2 border rounded-md"
-          required
-        >
-          <option value="">Select blood type</option>
-          <option value="A+">A+</option>
-          <option value="A-">A-</option>
-          <option value="B+">B+</option>
-          <option value="B-">B-</option>
-          <option value="AB+">AB+</option>
-          <option value="AB-">AB-</option>
-          <option value="O+">O+</option>
-          <option value="O-">O-</option>
-        </select>
-      </div>
-
-      {/* Sexul pacientului */}
-      <div className="mb-4">
-        <label className="block text-sm font-medium mb-1">Sex</label>
-        <select
-          name="sex"
-          value={patientData.sex}
-          onChange={handleInputChange}
-          className="w-full p-2 border rounded-md"
-          required
-        >
-          <option value="">Select sex</option>
-          <option value="Male">Male</option>
-          <option value="Female">Female</option>
-          <option value="Other">Other</option>
-        </select>
-      </div>
-
-      {/* Vârsta pacientului */}
-      <div className="mb-4">
-        <label className="block text-sm font-medium mb-1">Age</label>
-        <input
-          type="number"
-          name="age"
-          value={patientData.age}
-          onChange={handleInputChange}
-          className="w-full p-2 border rounded-md"
-          placeholder="Enter patient's age"
-          required
-        />
-      </div>
-
-        {/* greutatea pacientului */}
-        <div className="mb-4">
-        <label className="block text-sm font-medium mb-1">Greutate</label>
-        <input
-          type="text"
-          name="greutate"
-          value={patientData.greutate}
-          onChange={handleInputChange}
-          className="w-full p-2 border rounded-md"
-          placeholder="Enter patient's wieght"
-          required
-        />
-      </div>
-
-        {/* greutatea pacientului */}
-        <div className="mb-4">
-        <label className="block text-sm font-medium mb-1">Inaltime</label>
-        <input
-          type="text"
-          name="inaltime"
-          value={patientData.inaltime}
-          onChange={handleInputChange}
-          className="w-full p-2 border rounded-md"
-          placeholder="Enter patient's height"
-          required
-        />
-      </div>
-
-      {/* organType */}
-      <div className="mb-4">
-        <label className="block text-sm font-medium mb-1">Organ</label>
-        <input
-          type="text"
-          name="organType"
-          value={patientData.organType}
-          onChange={handleInputChange}
-          className="w-full p-2 border rounded-md"
-          placeholder="Enter patient's organ type"
-          required
-        />
-      </div>
-
-        {/* Risc chirurgical */}
-        <div className="mb-4">
-        <label className="block text-sm font-medium mb-1">Surgical Risk</label>
-        <select
-          name="surgicalRisk"
-          value={patientData.surgicalRisk}
-          onChange={handleInputChange}
-          className="w-full p-2 border rounded-md"
-          required
-        >
-          <option value="">Select risk level</option>
-          <option value="Low">Low</option>
-          <option value="Moderate">Moderate</option>
-          <option value="High">High</option>
-        </select>
-      </div>
-
-       {/* Gravitatea bolii */}
-       <div className="mb-4">
-        <label className="block text-sm font-medium mb-1">Disease Severity</label>
-        <select
-          name="diseaseSeverity"
-          value={patientData.diseaseSeverity}
-          onChange={handleInputChange}
-          className="w-full p-2 border rounded-md"
-          required
-        >
-          <option value="">Select severity</option>
-          <option value="Mild">Mild</option>
-          <option value="Moderate">Moderate</option>
-          <option value="Severe">Severe</option>
-          <option value="Critical">Critical</option>
-        </select>
-      </div>
-
-      {/* Istoric medical */}
-      <div className="mb-4">
-        <label className="block text-sm font-medium mb-1">Medical History</label>
-        <textarea
-          name="medicalHistory"
-          value={patientData.medicalHistory}
-          onChange={handleInputChange}
-          className="w-full p-2 border rounded-md"
-          placeholder="Enter patient's medical history"
-          rows="3"
-          required
-        ></textarea>
-      </div>
-
-      {/* Butoane pentru trimitere și anulare */}
-      <div className="flex justify-end">
-        <button
-          type="button"
-          onClick={() => setShowForm(false)}
-          className="mr-2 bg-gray-500 text-white p-2 rounded-md"
-        >
-          Cancel
-        </button>
-        <button
-          type="submit"
-          className="bg-green-500 text-white p-2 rounded-md"
-        >
-          Add Patient
-        </button>
-      </div>
-    </form>
-  </div>
-)}
-  </div>
-)}
+        {/* Butoane pentru trimitere și anulare */}
+        <div className="flex justify-end">
+          <button
+            type="button"
+            onClick={() => setShowForm(false)}
+            className="mr-2 bg-gray-500 text-white p-2 rounded-md"
+          >
+            Cancel
+          </button>
+          <button
+            type="submit"
+            className="bg-green-500 text-white p-2 rounded-md"
+          >
+            Add Patient
+          </button>
+        </div>
+      </form>
+    </div>
+  )}
+</div>
+      )}
 
       
-
-<div className="mt-5">
+<div className="flex">
+<div className="mt-5 p-5 ">
   <h3 className="text-xl font-bold">Patients List</h3>
   <ul className="list-disc mt-2">
     {patients.length === 0 ? (
       <li>No patients added yet.</li>
     ) : (
       patients.map((patientAddress, index) => (
-        <li key={index} className="flex items-center space-x-4">
+        <li key={index} className="flex items-center space-x-4 p-2 ">
           <p>{`${patientAddress.slice(0, 6)}...${patientAddress.slice(-4)}`}</p>
+          <div className="p-2 ml-2">
+
           <button
             onClick={() => fetchPatientData(patientAddress)}
-            className="bg-blue-500 text-white p-1 rounded-md text-sm"
+            className="bg-blue-500 text-white p-1 rounded-md text-sm ml-4"
           >
             View Details
           </button>
+          </div>
           <button
             onClick={() => requestAccess(patientAddress)}
             className="bg-green-500 text-white p-1 rounded-md text-sm"
@@ -766,7 +773,7 @@ const findMatchingPatientForOrgan = async (organNFT) => {
 </div>
 
 
-  <div className="p-7 flex flex-col gap-y-6 items-center">
+  <div className="p-7 flex flex-col gap-y-6 items-center ">
   <p className="text-4xl font-bold mb-5">Organs Ready for Transplant</p>
   <div className="flex justify-center space-x-5 p-1">
     {!organs.length ? (
@@ -798,6 +805,7 @@ const findMatchingPatientForOrgan = async (organNFT) => {
       ))
     )}
   </div>
+</div>
 </div>
 
 
