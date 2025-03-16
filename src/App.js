@@ -390,7 +390,7 @@ const fetchPatientData = async (patientAddress) => {
 };
 
 
-const findPatientByCriteria = async (criteria) => {
+const findMatchingPatientForOrgan = async (organNFT) => {
   if (!patientRegistry) {
     console.error("❌ Contractul PatientRegistry nu este inițializat!");
     return null;
@@ -403,15 +403,14 @@ const findPatientByCriteria = async (criteria) => {
       const patient = await patientRegistry.patients(patientAddress);
       const decryptedData = decryptData(patient.patientInfo, secretKey);
 
-
-      if (decryptedData && decryptedData.bloodType === criteria.bloodType) {
-        console.log("✅ Pacient găsit:", decryptedData);
+      // Verifică dacă organType al pacientului se potrivește cu organul NFT
+      if (decryptedData && decryptedData.organType.toLowerCase() === organNFT.organ.toLowerCase()) {
+        console.log("✅ Pacient găsit care are nevoie de organul:", organNFT.organ);
         return { address: patientAddress, ...decryptedData };
       }
     }
 
-
-    console.warn("⚠️ Niciun pacient nu corespunde criteriului.");
+    console.warn("⚠️ Niciun pacient nu are nevoie de acest organ:", organNFT.organ);
     return null;
   } catch (error) {
     console.error("❌ Eroare la căutarea pacientului:", error);
@@ -434,19 +433,13 @@ const findPatientByCriteria = async (criteria) => {
     <div>
       
       <Navigation account={account} setAccount={setAccount} />
-      <Search />
+ 
 
       <div className="p-7 flex flex-col gap-y-6 items-center">
   <p className="text-4xl font-bold">Organs For You</p>
 
 
 
-{account && organNFT && (
-  <div className="mt-5">
-    <h3 className="text-xl font-bold">Donate an Organ</h3>
-    <AddOrgan organNFT={organNFT} provider={provider} account={account} donorAddress={donorAddress} />
-  </div>
-)}
 
 
       
@@ -720,7 +713,7 @@ const findPatientByCriteria = async (criteria) => {
 )}
 
   {/* Afișează datele decriptate ale pacientului */}
-  <button
+  {/* <button
     onClick={async () => {
       const foundPatient = await findPatientByCriteria({ bloodType: "B+" });
       if (foundPatient) {
@@ -732,7 +725,7 @@ const findPatientByCriteria = async (criteria) => {
     className="bg-red-500 text-white p-2 rounded-md"
   >
     Find First B+ Patient
-  </button>
+  </button> */}
   {decryptedPatientData && (
     <div className="mt-4 p-4 border rounded-lg bg-gray-100">
       <h3 className="text-lg font-bold mb-2">Patient Details</h3>
@@ -755,7 +748,7 @@ const findPatientByCriteria = async (criteria) => {
 
 
   <div className="p-7 flex flex-col gap-y-6 items-center">
-  <p className="text-4xl font-bold">Organs For You</p>
+  <p className="text-4xl font-bold mb-5">Organs Ready for Transplant</p>
   <div className="flex justify-center space-x-5 p-1">
     {!organs.length ? (
       <p>Loading...</p>
@@ -798,7 +791,7 @@ const findPatientByCriteria = async (criteria) => {
     account={account} 
     selectedEscrow={escrow.find(e => e.address === organ.escrowAddress)} // Găsește contractul corect
     togglePop={togglePop} 
-    findPatientByCriteria={findPatientByCriteria}
+    findMatchingPatientForOrgan={findMatchingPatientForOrgan}
   />
 )}
 

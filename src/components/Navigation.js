@@ -1,4 +1,4 @@
-import logo from '../assets/logo1.png';
+import logo from '../assets/logo.png';
 
 const Navigation = ({ account, setAccount }) => {
     const connectHandler = async () => {
