@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 
-const Home = ({ organ, provider, account, escrow, togglePop, organs, findPatientByCriteria, foundPatient }) => {
+const Home = ({ organ, provider, account, selectedEscrow, togglePop, findPatientByCriteria }) => {
   const [donor, setDonor] = useState(null);
   const [patient, setPatient] = useState(null);
   const [doctor, setDoctor] = useState(null);
@@ -10,17 +10,19 @@ const Home = ({ organ, provider, account, escrow, togglePop, organs, findPatient
   const [futureOwner, setFutureOwner] = useState(null);
   const [patientSet, setPatientSet] = useState(false); // Stare pentru a verifica dacă pacientul a fost setat
 
-
-
   // Funcție pentru a prelua detalii despre transplant
   const fetchDetails = async () => {
-    const donor = await escrow.donor();
-    const doctor = await escrow.doctor();
-    const patient = await escrow.patient();
-    const organId = await escrow.organNFT();
-    const doctorApproved = await escrow.doctorApproved();
+    if (!selectedEscrow) {
+      console.error("❌ Contractul OrganEscrow nu a fost găsit!");
+      return;
+    }
 
-    const owners = await escrow.getOwners();
+    const donor = await selectedEscrow.donor();
+    const doctor = await selectedEscrow.doctor();
+    const patient = await selectedEscrow.patient();
+    const organId = await selectedEscrow.organNFT();
+    const doctorApproved = await selectedEscrow.doctorApproved();
+    const owners = await selectedEscrow.getOwners();
 
     setDonor(donor);
     setDoctor(doctor);
@@ -29,15 +31,16 @@ const Home = ({ organ, provider, account, escrow, togglePop, organs, findPatient
     setDoctorApproved(doctorApproved);
     setCurrentOwner(owners[0]);
     setFutureOwner(owners[1]);
-
   };
 
   useEffect(() => {
     const checkIfPatientIsSet = async () => {
-      const isSet = await escrow.isPatientSet();
+      if (!selectedEscrow) return;
+
+      const isSet = await selectedEscrow.isPatientSet();
       if (!isSet && !patientSet) { // Dacă pacientul nu a fost setat în contract și nici în starea locală
         const foundPatient = await findPatientByCriteria({ bloodType: "B+" });
-  
+
         if (foundPatient) {
           console.log("🔍 Pacient găsit automat:", foundPatient);
           await setPatientHandler(foundPatient.address);
@@ -47,92 +50,82 @@ const Home = ({ organ, provider, account, escrow, togglePop, organs, findPatient
         }
       }
     };
-  
+
     fetchDetails(); // Încarcă detaliile inițiale
     checkIfPatientIsSet();
-  }, [patientSet]); // Adaugă `patientSet` ca dependență
-  
+  }, [patientSet, selectedEscrow]); // Adaugă `selectedEscrow` ca dependență
 
   // Funcție pentru a seta adresa pacientului
   const setPatientHandler = async (address) => {
     try {
-        if (!address) {
-            alert("Patient address cannot be empty.");
-            return;
-        }
+      if (!address) {
+        alert("Patient address cannot be empty.");
+        return;
+      }
 
-        console.log("🔹 Setting patient to:", address); // Log nou
+      console.log("🔹 Setting patient to:", address); // Log nou
 
-        const signer = provider.getSigner(); // Obține semnatarul de la provider
-        const escrowWithSigner = escrow.connect(signer); // Conectează semnatarul la contract
+      const signer = provider.getSigner(); // Obține semnatarul de la provider
+      const escrowWithSigner = selectedEscrow.connect(signer); // Conectează semnatarul la contract
 
-        // Apelează funcția contractului pentru a seta pacientul
-        const tx = await escrowWithSigner.setPatient(address);
-        await tx.wait();  // Așteaptă confirmarea tranzacției
+      // Apelează funcția contractului pentru a seta pacientul
+      const tx = await escrowWithSigner.setPatient(address);
+      await tx.wait();  // Așteaptă confirmarea tranzacției
 
-        alert("Patient address set successfully!");
-        fetchDetails(); // Refresh details after setting the patient
+      alert("Patient address set successfully!");
+      fetchDetails(); // Refresh details after setting the patient
     } catch (error) {
-        console.error("Error setting patient address:", error);
-        alert("Failed to set patient address. Please try again.");
+      console.error("Error setting patient address:", error);
+      alert("Failed to set patient address. Please try again.");
     }
-};
-
-
+  };
 
   // Funcție pentru a transfera organul
   const transferOrganHandler = async () => {
     try {
-        if (!doctorApproved) {
-            alert("Doctor approval is required before transferring the organ.");
-            return;
-        }
+      if (!doctorApproved) {
+        alert("Doctor approval is required before transferring the organ.");
+        return;
+      }
 
-        const signer = provider.getSigner();
-        const escrowWithSigner = escrow.connect(signer);
+      const signer = provider.getSigner();
+      const escrowWithSigner = selectedEscrow.connect(signer);
 
+      // 🏦 Apelează contractul pentru a transfera organul
+      const tx = await escrowWithSigner.transferOrgan();
+      await tx.wait();
 
-        // 🏦 Apelează contractul pentru a transfera organul
-        const tx = await escrowWithSigner.transferOrgan();
-        await tx.wait(); 
+      setCurrentOwner(futureOwner); // Setăm noul proprietar pe moment
+      setFutureOwner(null); // Eliminăm viitorul proprietar temporar
+      alert("Organ transferred successfully!");
 
-        setCurrentOwner(futureOwner); // Setăm noul proprietar pe moment
-        setFutureOwner(null); // Eliminăm viitorul proprietar temporar
-        alert("Organ transferred successfully!");
-
-        fetchDetails(); // 🔄 Reîmprospătăm datele oficiale după confirmare
+      fetchDetails(); // 🔄 Reîmprospătăm datele oficiale după confirmare
     } catch (error) {
-        console.error("Error transferring organ:", error);
-        alert("Failed to transfer organ. Please try again.");
+      console.error("Error transferring organ:", error);
+      alert("Failed to transfer organ. Please try again.");
     }
-};
-
+  };
 
   // Funcție pentru ca doctorul să aprobe transplantul
   const approveTransplantHandler = async () => {
     try {
-        const signer = provider.getSigner();
-        const escrowWithSigner = escrow.connect(signer);
+      const signer = provider.getSigner();
+      const escrowWithSigner = selectedEscrow.connect(signer);
 
+      // Apelează funcția contractului pentru a aproba transplantul
+      const tx = await escrowWithSigner.approveTransplant();
+      await tx.wait();
 
-        // Apelează funcția contractului pentru a aproba transplantul
-        const tx = await escrowWithSigner.approveTransplant();
-        await tx.wait();
-        
-        // Actualizăm instant UI ca să pară că s-a aprobat deja
-        setDoctorApproved(true);
+      // Actualizăm instant UI ca să pară că s-a aprobat deja
+      setDoctorApproved(true);
 
-        alert("Transplant approved successfully!");
-        fetchDetails(); // Reîmprospătăm datele oficiale
+      alert("Transplant approved successfully!");
+      fetchDetails(); // Reîmprospătăm datele oficiale
     } catch (error) {
-        console.error("Error approving transplant:", error);
-        alert("Failed to approve transplant. Please try again.");
+      console.error("Error approving transplant:", error);
+      alert("Failed to approve transplant. Please try again.");
     }
-};
-
-
-
-  
+  };
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50">
@@ -150,49 +143,39 @@ const Home = ({ organ, provider, account, escrow, togglePop, organs, findPatient
         <p><strong>Doctor Approval:</strong> {doctorApproved ? "✅ Approved" : "❌ Not Approved"}</p>
         <p><strong>Current NFT Owner:</strong> {currentOwner ? `${currentOwner.slice(0, 6)}...${currentOwner.slice(-4)}` : "Loading..."}</p>
         <p><strong>Future NFT Owner:</strong> {futureOwner ? `${futureOwner.slice(0, 6)}...${futureOwner.slice(-4)}` : "Not assigned yet"}</p>
-      {/* 🔥 Afișează și datele despre NFT */}
-      {organ && (  // ✅ Acum organul este primit corect și folosit
+
+        {/* 🔥 Afișează și datele despre NFT */}
+        {organ && (
           <div className="mt-5 flex">
             <h3 className="text-xl font-bold">Organ Details</h3>
             <img src={organ.image || "fallback.jpg"} className="w-[350px] h-auto rounded-t-lg" />
             <p><strong>Organ:</strong> {organ.organ || "N/A"}</p>
-      
+            <p><strong>Blood Type:</strong> {organ.bloodType || organ.attributes?.find(attr => attr.trait_type === "Blood Type")?.value || "N/A"}</p>
             <p><strong>Description:</strong> {organ.description || "No description"}</p>
             {/* Afișează toate atributele disponibile */}
             <div className="mt-2 flex">
               <strong>Attributes:</strong>
               <ul>
-              {organ.attributes?.map((attr, i) => (
+                {organ.attributes?.map((attr, i) => (
                   <li key={i}>{attr.trait_type}: {attr.value}</li>
                 ))}
               </ul>
             </div>
           </div>
         )}
-        <div className="flex flex-col gap-3 mt-5">
-          {/* {account === donor && (
-            <button onClick={() => setPatientHandler(prompt("Enter patient's address:"))}
-              className="bg-blue-500 text-white p-2 rounded-md">
-              Set Patient
-            </button>
-          )} */}
 
+        <div className="flex flex-col gap-3 mt-5">
           {account === doctor && (
-            <button onClick={approveTransplantHandler}
-              className="bg-green-500 text-white p-2 rounded-md">
+            <button onClick={approveTransplantHandler} className="bg-green-500 text-white p-2 rounded-md">
               Approve Transplant
             </button>
           )}
 
           {account === donor && (
-            <button onClick={transferOrganHandler}
-              className={`p-2 rounded-md ${doctorApproved ? "bg-red-500 text-white" : "bg-gray-400 text-gray-700 cursor-not-allowed"}`}
-              disabled={!doctorApproved}>
+            <button onClick={transferOrganHandler} className={`p-2 rounded-md ${doctorApproved ? "bg-red-500 text-white" : "bg-gray-400 text-gray-700 cursor-not-allowed"}`} disabled={!doctorApproved}>
               Transfer Organ
             </button>
           )}
-
-          
         </div>
       </div>
     </div>

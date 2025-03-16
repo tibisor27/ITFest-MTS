@@ -74,7 +74,7 @@ function App() {
 
   const loadBlockchainData = async () => {
     console.log("🚀 loadBlockchainData called!");
-    
+  
     if (!window.ethereum) {
       console.error("❌ MetaMask nu este instalat!");
       return;
@@ -95,12 +95,12 @@ function App() {
         return;
       }
   
-      window.ethereum.on('accountsChanged', async() => {
+      window.ethereum.on('accountsChanged', async () => {
         const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-        const account = ethers.utils.getAddress(accounts[0])
+        const account = ethers.utils.getAddress(accounts[0]);
         setAccount(account);
-      }); 
-      
+      });
+  
       const organNFTAddress = config[network.chainId]?.organNFT?.address;
       if (!organNFTAddress) {
         console.error("❌ Adresa OrganNFT este undefined! Verifică config.json");
@@ -116,11 +116,11 @@ function App() {
         provider
       );
   
-      const escrow = new ethers.Contract(
-        config[network.chainId].escrow.address,
-        OrganEscrow,
-        provider
-      );
+      // Încarcă ambele contracte OrganEscrow
+      const escrowContracts = config[network.chainId].escrow.map(escrowConfig => {
+        return new ethers.Contract(escrowConfig.address, OrganEscrow, provider);
+      });
+      setEscrow(escrowContracts); // Setează un array de contracte
   
       const patientRegistry = new ethers.Contract(
         config[network.chainId].patientRegistry.address,
@@ -129,7 +129,6 @@ function App() {
       );
   
       setWaitingList(waitingList);
-      setEscrow(escrow);
       setPatientRegistry(patientRegistry);
   
       console.log("📜 Contracte inițializate!");
@@ -145,14 +144,13 @@ function App() {
         try {
           const response = await fetch(uri);
           const metadata = await response.json();
+          metadata.escrowAddress = config[network.chainId].escrow[i - 1].address; // Asociază contractul OrganEscrow
           fetchedOrgans.push(metadata);
         } catch (error) {
           console.error("⚠️ Eroare la încărcarea NFT:", error);
         }
       }
-  
       setOrgans(fetchedOrgans);
-
       console.log("✅ Organs loaded:", fetchedOrgans);
   
       // Load patients
@@ -160,9 +158,7 @@ function App() {
       setPatients(patientList);
       console.log("✅ Patients loaded:", patientList);
   
-      // 🔥 Apelează fetchDonorAddress DOAR după ce organNFT este setat!
       await fetchDonorAddress(organNFT);
-  
     } catch (error) {
       console.error("❌ Eroare în loadBlockchainData:", error);
     }
@@ -216,7 +212,6 @@ const addPatientHandler = async (patientAddress, patientInfo) => {
     return;
   }
 
-
   try {
     const encryptedPatientInfo = encryptData(patientInfo, secretKey);
 
@@ -224,24 +219,21 @@ const addPatientHandler = async (patientAddress, patientInfo) => {
     const patientRegistryWithSigner = patientRegistry.connect(signer);
 
     const tx = await patientRegistryWithSigner.addPatient(patientAddress, encryptedPatientInfo);
-    console.log("adresa pacient:", patientAddress)
-    console.log("patiennt info:", patientInfo)
-    console.log("patiennt data:", patientData)
-    console.log("ecnrypted patient info:", encryptedPatientInfo)
+    console.log("adresa pacient:", patientAddress);
+    console.log("patiennt info:", patientInfo);
+    console.log("patiennt data:", patientData);
+    console.log("ecnrypted patient info:", encryptedPatientInfo);
 
     await tx.wait(); // 🔥 Așteptăm confirmarea tranzacției
     alert(`Patient ${patientAddress} added successfully`);
 
-    // 🛠 Actualizăm manual lista pacienților
+    // 🛠 Reîncarcă lista de pacienți după adăugare
     const updatedPatients = await patientRegistry.getPatientList();
-    setPatients(updatedPatients); // 🔥 Acum pacienții sunt actualizați în interfață
+    setPatients(updatedPatients); // 🔥 Actualizează starea cu noua listă de pacienți
   } catch (error) {
     console.error("Error adding patient:", error);
     alert("Failed to add patient.");
   }
-
-
-
 };
 
 const decryptData = (encryptedData, secret) => {
@@ -670,15 +662,14 @@ const findPatientByCriteria = async (criteria) => {
 
       </div>
 
-{toggle && (
+      {toggle && (
   <Home 
     organ={organ}  
     provider={provider} 
     account={account} 
-    escrow={escrow} 
+    selectedEscrow={escrow.find(e => e.address === organ.escrowAddress)} // Găsește contractul corect
     togglePop={togglePop} 
-    organs={organs} 
-    findPatientByCriteria={findPatientByCriteria} // 🔥 Adăugat aici!
+    findPatientByCriteria={findPatientByCriteria}
   />
 )}
 

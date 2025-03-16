@@ -1,7 +1,7 @@
 const hre = require("hardhat"); // ✅ Import corect
 
 async function main() {
-  const [donor, doctor, patient] = await hre.ethers.getSigners();
+  const [donor, doctor, donor2, pacient] = await hre.ethers.getSigners();
   console.log("Doctor Address: ", doctor.address); // Asigură-te că aceasta este adresa medicului
 
   
@@ -56,12 +56,17 @@ if (doctor.address !== doctorFromContract) {
     "https://ipfs.io/ipfs/bafkreicz3nnxkuvj7vaxaotzpun7mfzunv2adt6mc6udhgvugkkwyyhvoy"
   );
   
-
-
   const mintReceipt = await mintTx.wait();
   const nftId = mintReceipt.events[0].args.tokenId.toNumber(); // Extragem ID-ul NFT-ului
 
   console.log(`✅ Minted Organ NFT with ID: ${nftId}`);
+
+  const mintTx2 = await organNFT.connect(donor2).mintOrganNFT(
+    "https://ipfs.io/ipfs/bafkreidrw56d4o7n7typlfnv3o5f6znybsldudmyzul46plnlong3zpb3a" // URI pentru al doilea organ
+  );
+  const mintReceipt2 = await mintTx2.wait();
+  const nftId2 = mintReceipt2.events[0].args.tokenId.toNumber(); // ID-ul celui de-al doilea NFT
+  console.log(`✅ Minted second Organ NFT with ID: ${nftId2}`);
 
   // Deploy OrganEscrow Contract cu ID-ul corect al NFT-ului
   const OrganEscrow = await hre.ethers.getContractFactory("OrganEscrow");
@@ -79,6 +84,27 @@ if (doctor.address !== doctorFromContract) {
   const approveTx = await organNFT.connect(donor).approve(organEscrow.address, nftId);
   await approveTx.wait();
   console.log(`✅ NFT ID ${nftId} approved for escrow`);
+
+
+    // Deploy OrganEscrow2 Contract cu ID-ul corect al NFT-ului
+    const OrganEscrow2 = await hre.ethers.getContractFactory("OrganEscrow");
+    const organEscrow2 = await OrganEscrow2.deploy(
+      donor2.address,
+      nftId2, // Folosim ID-ul obținut din mintTx
+      organNFT.address,
+      doctor.address
+    );
+  
+    await organEscrow2.deployed();
+    console.log(`Deployed OrganEscrow2 Contract at: ${organEscrow2.address}`);
+  
+    // Aprobare NFT pentru escrow
+    const approveTx2 = await organNFT.connect(donor2).approve(organEscrow2.address, nftId2);
+    await approveTx2.wait();
+    console.log(`✅ NFT ID ${nftId2} approved for escrow`);
+
+
+  
 }
 
 main().catch((error) => {
