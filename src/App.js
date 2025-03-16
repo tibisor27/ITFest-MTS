@@ -638,9 +638,8 @@ const findPatientByCriteria = async (criteria) => {
             </div>
             <div className="p-3">
               <p><strong>Organ:</strong> {organ.organ || "N/A"}</p>
-              <p><strong>Blood Type:</strong> {organ.BloodType || organ.attributes?.find(attr => attr.trait_type === "Blood Type")?.value || "N/A"}</p>
+              <p><strong>Blood Type:</strong> {organ.bloodType || organ.attributes?.find(attr => attr.trait_type === "Blood Type")?.value || "N/A"}</p>
               <p><strong>Description:</strong> {organ.description || "No description"}</p>
-              <p><strong>ID:</strong> {organ.id}</p>
               
               {/* Afișează toate atributele disponibile */}
               <div className="mt-2">
