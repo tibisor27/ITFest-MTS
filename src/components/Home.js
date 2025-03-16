@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 
 const Home = ({ organ, provider, account, selectedEscrow, togglePop, findPatientByCriteria }) => {
+  console.log("test organ:",organ);
   const [donor, setDonor] = useState(null);
   const [patient, setPatient] = useState(null);
   const [doctor, setDoctor] = useState(null);

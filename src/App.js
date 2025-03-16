@@ -52,6 +52,7 @@ function App() {
     
   });
   const [decryptedPatientData, setDecryptedPatientData] = useState(null);
+  const [accessRequests, setAccessRequests] = useState([]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -188,7 +189,111 @@ function App() {
     }
   };
   
+  const requestAccess = async (patientAddress) => {
+    if (!account) {
+      alert("Please connect your wallet.");
+      return;
+    }
+  
+    try {
+      const signer = provider.getSigner();
+      const patientRegistryWithSigner = patientRegistry.connect(signer);
+  
+      const tx = await patientRegistryWithSigner.requestAccess(patientAddress);
+      await tx.wait();
+  
+      alert("Access request sent successfully!");
+    } catch (error) {
+      console.error("Error requesting access:", error);
+      alert("Failed to request access.");
+    }
+  };
 
+  const approveAccess = async (patientAddress, doctorAddress, approved) => {
+    if (!account) {
+      alert("Please connect your wallet.");
+      return;
+    }
+  
+    try {
+      const signer = provider.getSigner();
+      const patientRegistryWithSigner = patientRegistry.connect(signer);
+  
+      // Approve or reject the access request
+      const tx = await patientRegistryWithSigner.approveAccess(patientAddress, doctorAddress, approved);
+      await tx.wait();
+  
+      alert(`Access ${approved ? "approved" : "rejected"} successfully!`);
+    } catch (error) {
+      console.error("Error approving access:", error);
+      alert("Failed to approve access.");
+    }
+  };
+  const loadAccessRequests = async (patientAddress) => {
+    if (!account || !patientRegistry) {
+      console.error("Account or PatientRegistry not initialized.");
+      return;
+    }
+  
+    try {
+      // Încarcă cererile de acces pentru pacientul curent
+      const requests = await patientRegistry.getAccessRequests(patientAddress);
+      setAccessRequests(requests);
+    } catch (error) {
+      console.error("Error loading access requests:", error);
+    }
+  };
+
+
+
+  const AccessRequests = ({ patientAddress }) => {
+    const [requests, setRequests] = useState([]);
+  
+    useEffect(() => {
+      const loadRequests = async () => {
+        if (patientAddress && patientRegistry) {
+          try {
+            // Fetch access requests for the patient
+            const requests = await patientRegistry.getAccessRequests(patientAddress);
+            setRequests(requests);
+          } catch (error) {
+            console.error("Error loading access requests:", error);
+          }
+        }
+      };
+  
+      loadRequests();
+    }, [patientAddress, patientRegistry]);
+  
+    return (
+      <div className="mt-4">
+        <h3 className="text-lg font-bold">Access Requests</h3>
+        {requests.length === 0 ? (
+          <p>No access requests found.</p>
+        ) : (
+          <ul>
+            {requests.map((request, index) => (
+              <li key={index} className="flex items-center space-x-4">
+                <p>{`${request.doctorAddress.slice(0, 6)}...${request.doctorAddress.slice(-4)}`}</p>
+                <button
+                  onClick={() => approveAccess(patientAddress, request.doctorAddress, true)}
+                  className="bg-green-500 text-white p-1 rounded-md text-sm"
+                >
+                  Approve
+                </button>
+                <button
+                  onClick={() => approveAccess(patientAddress, request.doctorAddress, false)}
+                  className="bg-red-500 text-white p-1 rounded-md text-sm"
+                >
+                  Reject
+                </button>
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
+    );
+  };
   const encryptData = (data, secret) => {
     return CryptoJS.AES.encrypt(JSON.stringify(data), secret).toString();
   };
@@ -248,14 +353,27 @@ const decryptData = (encryptedData, secret) => {
 
 // Exemplu de utilizare pentru a afișa detaliile pacientului
 const fetchPatientData = async (patientAddress) => {
-  const userInputKey = prompt("Enter the secret key to view details:");
-
-  if (userInputKey !== secretKey) {
-    alert("Incorrect secret key!");
+  if (!account) {
+    alert("Please connect your wallet.");
     return;
   }
 
   try {
+    // Check if the current account has access to the patient's data
+    const hasAccess = await patientRegistry.hasAccess(account, patientAddress);
+    if (!hasAccess) {
+      alert("You do not have access to this patient's data. Please request access.");
+      return;
+    }
+
+    // Prompt for the secret key
+    const userInputKey = prompt("Enter the secret key to view details:");
+    if (userInputKey !== secretKey) {
+      alert("Incorrect secret key!");
+      return;
+    }
+
+    // Fetch and decrypt patient data
     const patient = await patientRegistry.patients(patientAddress);
     const decryptedData = decryptData(patient.patientInfo, secretKey);
 
@@ -267,9 +385,9 @@ const fetchPatientData = async (patientAddress) => {
     }
   } catch (error) {
     console.error("Error fetching patient data:", error);
+    alert("Failed to fetch patient data.");
   }
 };
-
 
 
 const findPatientByCriteria = async (criteria) => {
@@ -314,6 +432,7 @@ const findPatientByCriteria = async (criteria) => {
 
   return (
     <div>
+      
       <Navigation account={account} setAccount={setAccount} />
       <Search />
 
@@ -584,10 +703,21 @@ const findPatientByCriteria = async (criteria) => {
           >
             View Details
           </button>
+          <button
+            onClick={() => requestAccess(patientAddress)}
+            className="bg-green-500 text-white p-1 rounded-md text-sm"
+          >
+            Request Access
+          </button>
         </li>
       ))
     )}
   </ul>
+
+  {/* Afișează cererile de acces pentru pacientul curent */}
+  {account && patients.includes(account) && (
+  <AccessRequests patientAddress={account} />
+)}
 
   {/* Afișează datele decriptate ale pacientului */}
   <button

@@ -2113,8 +2113,8 @@
       ]
     },
     "/Users/sebyboiciuc/Desktop/hackaton/ITFest-MTS/contracts/PatientRegistry.sol": {
-      "lastModificationDate": 1742042008878,
-      "contentHash": "20c001d370ec07028d66254ec578479b",
+      "lastModificationDate": 1742128026916,
+      "contentHash": "e2a57782fcdeff09122f2a6757e50eb9",
       "sourceName": "contracts/PatientRegistry.sol",
       "solcConfig": {
         "version": "0.8.17",
@@ -2140,7 +2140,9 @@
         }
       },
       "imports": [],
-      "versionPragmas": [],
+      "versionPragmas": [
+        "^0.8.0"
+      ],
       "artifacts": [
         "PatientRegistry"
       ]
