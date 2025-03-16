@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom';
 import logo from '../assets/logo.png';
 
 const Navigation = ({ account, setAccount }) => {
@@ -25,9 +26,9 @@ const Navigation = ({ account, setAccount }) => {
         <nav className='grid grid-cols-12 items-center  px-20'>
             {/* Secțiunea din stânga */}
             <div className='col-span-4 flex space-x-4'>
-                <p className='cursor-pointer transition-all duration-300 hover:text-lg'>med</p>
-                <p className='cursor-pointer transition-all duration-300 hover:text-lg'>med</p>
-                <p className='cursor-pointer transition-all duration-300 hover:text-lg'>med</p>
+            <Link to="/" className='cursor-pointer transition-all duration-300 hover:text-md'>Home</Link>
+            <Link to="/med" className='cursor-pointer transition-all duration-100 hover:text-md'>How it works</Link>
+
             </div>
 
             {/* Logo-ul în mijloc */}
